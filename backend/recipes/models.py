@@ -24,6 +24,12 @@ class User(AbstractUser):
         ordering = ('pk',)
 
 
+class Tag(models.Model):
+    name = models.CharField(max_length=32, unique=True)
+    color = models.CharField(max_length=6, unique=True)
+    slug = models.SlugField(unique=True)
+
+
 class Components(models.Model):
     """
     Список всех возможных составных частей для блюд
@@ -38,7 +44,6 @@ class Recipe(models.Model):
     name = models.CharField(max_length=64)
     picture = models.ImageField(
         upload_to='recipes/images/',
-        null=True,
         default=None
         )
     description = models.TextField(max_length=1000, blank=True, null=True)
@@ -47,14 +52,24 @@ class Recipe(models.Model):
         through='Ingredients',
         related_name='recipe',
     )
+    tag = models.ManyToManyField(
+        Tag,
+        through='RecipesTags'
+    )
+    prep_time = models.IntegerField()
+
+
+class RecipesTags(models.Model):
+    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
+    tag = models.ForeignKey(Tag, on_delete=models.CASCADE)
 
 
 class Ingredients(models.Model):
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
-    name = models.ForeignKey(Components, on_delete=models.SET_NULL, null=True)
+    name = models.ForeignKey(Components, on_delete=models.CASCADE)
     quantity = models.CharField(max_length=8)
     measure = models.CharField(max_length=32)
 
 
-class Tag(models.Model):
-    pass
+
+
