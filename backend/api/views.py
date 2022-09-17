@@ -1,3 +1,7 @@
 from django.shortcuts import render
+from django.urls import include, path
+from rest_framework import routers
 
-# Create your views here.
+
+app_name = 'api'
+
