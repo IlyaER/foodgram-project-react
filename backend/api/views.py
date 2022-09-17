@@ -1,7 +1,9 @@
 from django.shortcuts import render
-from django.urls import include, path
-from rest_framework import routers
+from rest_framework.viewsets import GenericViewSet, ModelViewSet
+from recipes.models import User
+from .serializers import UserSerializer
 
 
-app_name = 'api'
-
+class UserViewSet(ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
