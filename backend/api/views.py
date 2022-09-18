@@ -22,4 +22,3 @@ class UserViewSet(ModelViewSet):
     @action(methods=['POST'], detail=False)
     def set_password(self, request, *args, **kwargs):
         return Response('test')
-
