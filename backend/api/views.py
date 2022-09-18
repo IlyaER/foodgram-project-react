@@ -14,8 +14,12 @@ class UserViewSet(ModelViewSet):
 
     @action(methods=['GET'], detail=False, url_path='me', url_name='me')
     def me(self, request, *args, **kwargs):
+        user = self.request.user
+        serializer = self.get_serializer(user)
         # TODO implement 'me' page
+        return Response(serializer.data)
+
+    @action(methods=['POST'], detail=False)
+    def set_password(self, request, *args, **kwargs):
         return Response('test')
-
-
 

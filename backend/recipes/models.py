@@ -71,5 +71,25 @@ class Ingredients(models.Model):
     measure = models.CharField(max_length=32)
 
 
+class Subscribe(models.Model):
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        verbose_name='Подписчик',
+        related_name='subscriber'
+    )
+    subscribed_to = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        verbose_name='На кого подписан',
+        related_name='subscribed'
+    )
 
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['user', 'subscribed_to'],
+                name='unique subscribers'
+            )
+        ]
 
