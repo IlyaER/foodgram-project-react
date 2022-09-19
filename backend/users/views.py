@@ -1,11 +1,15 @@
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
+from rest_auth.models import TokenModel
+from rest_auth.views import LoginView
 from rest_framework.authtoken.models import Token
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.decorators import action
+from rest_framework.generics import GenericAPIView
+from rest_framework.permissions import AllowAny
 from rest_framework.viewsets import GenericViewSet, ModelViewSet
 from recipes.models import User
-from .serializers import UserSerializer, EmailAuthTokenSerializer
+from .serializers import UserSerializer, EmailAuthTokenSerializer, AuthTokenSerializer
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 
@@ -25,6 +29,13 @@ class UserViewSet(ModelViewSet):
     @action(methods=['POST'], detail=False)
     def set_password(self, request, *args, **kwargs):
         return Response('test')
+
+
+class TokenLoginView(GenericAPIView):
+    token_model = TokenModel
+
+    def get_response_serializer(self):
+        return AuthTokenSerializer
 
 
 
