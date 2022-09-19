@@ -30,7 +30,6 @@ INSTALLED_APPS = [
     'rest_auth.registration',
     'rest_framework',
     'rest_framework.authtoken',
-
     'corsheaders',
     'recipes.apps.RecipesConfig',
     'api.apps.ApiConfig',
@@ -74,9 +73,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'foodgram.wsgi.application'
 
-
-# Database
-# https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
 DATABASES = {
     'default': {
@@ -133,8 +129,7 @@ REST_AUTH_SERIALIZERS = {
     'TOKEN_SERIALIZER': 'users.serializers.AuthTokenSerializer',
 }
 
-AUTHENTICATION_METHOD = 'EMAIL'
-
+ACCOUNT_AUTHENTICATION_METHOD = 'EMAIL'
 
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',

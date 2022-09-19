@@ -1,4 +1,5 @@
 from django.urls import include, path
+from rest_auth.views import PasswordChangeView
 from rest_framework import routers
 from rest_framework.authtoken import views
 
@@ -9,12 +10,14 @@ from .views import *
 app_name = 'api'
 
 router = routers.DefaultRouter()
-router.register('users', UserViewSet, basename='users')
+#router.register('users', UserViewSet, basename='users')
 
 
 
 urlpatterns = [
     path('', include(router.urls)),
     path('auth/token/', include('users.urls')),
+    path('users/set_password/', PasswordChangeView.as_view(),
+        name='rest_password_change'),
 
 ]
