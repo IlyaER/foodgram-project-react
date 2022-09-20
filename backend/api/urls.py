@@ -1,5 +1,5 @@
+from django.conf.urls import url
 from django.urls import include, path
-from rest_auth.views import PasswordChangeView
 from rest_framework import routers
 from rest_framework.authtoken import views
 
@@ -16,8 +16,8 @@ router = routers.DefaultRouter()
 
 urlpatterns = [
     path('', include(router.urls)),
-    path('auth/token/', include('users.urls')),
-    path('users/set_password/', PasswordChangeView.as_view(),
-        name='rest_password_change'),
+    path('', include('djoser.urls')),
+    path('auth/', include('djoser.urls.authtoken')),
+    #path('auth/token/', include('users.urls')),
 
 ]

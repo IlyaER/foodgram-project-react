@@ -26,11 +26,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'rest_auth',
-    'rest_auth.registration',
     'rest_framework',
     'rest_framework.authtoken',
     'corsheaders',
+    'djoser',
     'recipes.apps.RecipesConfig',
     'api.apps.ApiConfig',
     'users.apps.UsersConfig',
@@ -82,8 +81,6 @@ DATABASES = {
 }
 
 
-# Password validation
-# https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -101,9 +98,6 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
-# Internationalization
-# https://docs.djangoproject.com/en/2.2/topics/i18n/
-
 LANGUAGE_CODE = 'ru-ru'
 
 TIME_ZONE = 'UTC'
@@ -115,9 +109,6 @@ USE_L10N = True
 USE_TZ = True
 
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/2.2/howto/static-files/
-
 STATIC_URL = '/static/'
 
 MEDIA_URL = '/media/'
@@ -125,11 +116,13 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 AUTH_USER_MODEL = 'users.User'
 
-REST_AUTH_SERIALIZERS = {
-    'TOKEN_SERIALIZER': 'users.serializers.AuthTokenSerializer',
-}
 
-ACCOUNT_AUTHENTICATION_METHOD = 'EMAIL'
+DJOSER = {
+    'LOGIN_FIELD': 'email',
+    #'SERIALIZERS': {
+    #                   'user': 'users.serializers.UserSerializer',
+    #               },
+}
 
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
