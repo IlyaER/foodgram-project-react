@@ -5,6 +5,7 @@ from django.contrib.auth.models import UserManager
 from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
 
+
 class CustomUserManager(UserManager):
 
     def get_by_natural_key(self, username):
@@ -18,6 +19,8 @@ class User(AbstractUser):
     email = models.EmailField(_('email address'), unique=True)
     first_name = models.CharField(_('first name'), max_length=30)
     last_name = models.CharField(_('last name'), max_length=150)
+    is_subscribed = models.BooleanField(default=False)
+
     USER = 'user'
     ADMIN = 'admin'
     USERROLES = [
@@ -31,11 +34,11 @@ class User(AbstractUser):
         default=USER
     )
 
-    # @property
-    # def is_admin(self):
-    #     return self.access == self.ADMIN
+    @property
+    def is_admin(self):
+        return self.access == self.ADMIN
 
-    objects = CustomUserManager()
+    #objects = CustomUserManager()
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username', 'first_name', 'last_name']

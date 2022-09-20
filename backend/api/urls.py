@@ -3,7 +3,7 @@ from django.urls import include, path
 from rest_framework import routers
 from rest_framework.authtoken import views
 
-from users.views import UserViewSet
+#from users.views import UserViewSet
 from .views import *
 
 

@@ -13,17 +13,17 @@ from rest_framework.response import Response
 from django.utils.translation import ugettext_lazy as _
 
 
-class UserViewSet(ModelViewSet):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-    pagination_class = PageNumberPagination
-
-    @action(methods=['GET'], detail=False, url_path='me', url_name='me')
-    def me(self, request, *args, **kwargs):
-        user = self.request.user
-        serializer = self.get_serializer(user)
-        # TODO implement 'me' page
-        return Response(serializer.data)
+#class UserViewSet(ModelViewSet):
+#    queryset = User.objects.all()
+#    serializer_class = UserSerializer
+#    pagination_class = PageNumberPagination
+#
+#    @action(methods=['GET'], detail=False, url_path='me', url_name='me')
+#    def me(self, request, *args, **kwargs):
+#        user = self.request.user
+#        serializer = self.get_serializer(user)
+#        # TODO implement 'me' page
+#        return Response(serializer.data)
 
     #@action(methods=['POST'], detail=False)
     #def set_password(self, request, *args, **kwargs):
