@@ -7,11 +7,13 @@ from rest_framework.authtoken import views
 from .views import *
 
 
+
 app_name = 'api'
 
 router = routers.DefaultRouter()
 #router.register('users', UserViewSet, basename='users')
-
+router.register('tags', TagViewSet)
+router.register('ingredients', IngredientViewSet)
 
 
 urlpatterns = [

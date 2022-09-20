@@ -5,15 +5,16 @@ from users.models import User
 
 class Tag(models.Model):
     name = models.CharField(max_length=32, unique=True)
-    color = models.CharField(max_length=6, unique=True)
+    color = models.CharField(max_length=7, unique=True)
     slug = models.SlugField(unique=True)
 
 
-class Components(models.Model):
+class Ingredients(models.Model):
     """
     Список всех возможных составных частей для блюд
     """
     name = models.CharField(max_length=64)
+    measurement_unit = models.CharField(max_length=32)
 
 
 class Recipe(models.Model):
@@ -27,8 +28,8 @@ class Recipe(models.Model):
         )
     description = models.TextField(max_length=1000, blank=True, null=True)
     ingredient = models.ManyToManyField(
-        Components,
-        through='Ingredients',
+        Ingredients,
+        through='RecipeIngredients',
         related_name='recipe',
     )
     tag = models.ManyToManyField(
@@ -43,11 +44,11 @@ class RecipesTags(models.Model):
     tag = models.ForeignKey(Tag, on_delete=models.CASCADE)
 
 
-class Ingredients(models.Model):
+class RecipeIngredients(models.Model):
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
-    name = models.ForeignKey(Components, on_delete=models.CASCADE)
+    name = models.ForeignKey(Ingredients, on_delete=models.CASCADE)
     quantity = models.CharField(max_length=8)
-    measure = models.CharField(max_length=32)
+    #measure = models.CharField(max_length=32)
 
 
 class Subscribe(models.Model):
