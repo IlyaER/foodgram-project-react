@@ -14,7 +14,7 @@ router = routers.DefaultRouter()
 #router.register('users', UserViewSet, basename='users')
 router.register('tags', TagViewSet)
 router.register('ingredients', IngredientViewSet)
-
+router.register('recipes', RecipesViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),

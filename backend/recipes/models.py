@@ -22,11 +22,11 @@ class Recipe(models.Model):
         User, on_delete=models.CASCADE
     )
     name = models.CharField(max_length=64)
-    picture = models.ImageField(
+    image = models.ImageField(
         upload_to='recipes/images/',
         default=None
         )
-    description = models.TextField(max_length=1000, blank=True, null=True)
+    text = models.TextField(max_length=1200)
     ingredient = models.ManyToManyField(
         Ingredients,
         through='RecipeIngredients',
@@ -36,7 +36,7 @@ class Recipe(models.Model):
         Tag,
         through='RecipesTags'
     )
-    prep_time = models.IntegerField()
+    cooking_time = models.IntegerField()
 
 
 class RecipesTags(models.Model):
