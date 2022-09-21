@@ -45,7 +45,7 @@ class RecipesTags(models.Model):
 
 
 class RecipeIngredients(models.Model):
-    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
+    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE, related_name='tags')
     name = models.ForeignKey(Ingredients, on_delete=models.CASCADE)
     quantity = models.CharField(max_length=8)
     #measure = models.CharField(max_length=32)

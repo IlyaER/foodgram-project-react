@@ -26,3 +26,15 @@ class RecipesViewSet(ModelViewSet):
     queryset = Recipe.objects.all()
     serializer_class = RecipeSerializer
 
+class SubscribeViewSet(ModelViewSet):
+    serializer_class = SubscribeSerializer
+
+    #permission_classes = (IsAuthenticated, )
+    #filter_backends = (filters.SearchFilter, )
+    search_fields = ('is_subscribed__username',)
+
+    def get_queryset(self):
+        return self.request.user.subscriber.all()
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
