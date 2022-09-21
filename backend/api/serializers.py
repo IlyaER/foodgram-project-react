@@ -8,6 +8,12 @@ class TagSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tag
         fields = ('id', 'name', 'color', 'slug')
+        read_only_fields = ('name', 'color', 'slug')
+
+    def validate(self, data):
+        print(data)
+        return data
+
 
 
 class IngredientSerializer(serializers.ModelSerializer):
@@ -18,15 +24,22 @@ class IngredientSerializer(serializers.ModelSerializer):
 
 class RecipeIngredientSerializer(serializers.ModelSerializer):
     name = serializers.SlugRelatedField(
-        slug_field='name', read_only=True
+        slug_field='name',
+        read_only=True
     )
     #measurement_unit = IngredientSerializer(source='name')
-    measurement_unit = serializers.SlugRelatedField(source='name',
-        slug_field='measurement_unit', queryset=Ingredients.objects.all())
+    measurement_unit = serializers.SlugRelatedField(
+        source='name',
+        slug_field='measurement_unit',
+        #queryset=Ingredients.objects.all(),
+        read_only=True,
+    )
+
     class Meta:
         model = RecipeIngredients
         #fields = '__all__'
-        fields = ('id', 'name', 'amount', 'measurement_unit')
+        fields = ('id', 'name', 'measurement_unit', 'amount')
+        read_only_fields = ('name', 'measurement_unit')
 
 
 class RecipeSerializer(serializers.ModelSerializer):
@@ -35,13 +48,13 @@ class RecipeSerializer(serializers.ModelSerializer):
     #)
     author = UserSerializer(read_only=True)
     ingredients = RecipeIngredientSerializer(source='recipes', many=True)
-    tags = TagSerializer(many=True)
+    tags = TagSerializer(many=True, read_only=True)
 
     class Meta:
         model = Recipe
         #fields = '__all__'
-        fields = ('id', 'tags', 'author', 'ingredients', )
-
+        fields = ('id', 'tags', 'author', 'ingredients', 'name', 'image', 'text', 'cooking_time',)
+        # TODO "is_favorited": true, "is_in_shopping_cart": true,
 
 
 
