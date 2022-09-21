@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from recipes.models import *
+from users.serializers import UserSerializer
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -16,23 +17,25 @@ class IngredientSerializer(serializers.ModelSerializer):
 
 
 class RecipeSerializer(serializers.ModelSerializer):
-    author = serializers.SlugRelatedField(
-        slug_field='username', read_only=True
-    )
-    #ingredients = IngredientSerializer(many=True)
-    tags = TagSerializer(many=True, required=True)
+    #author = serializers.SlugRelatedField(
+    #    slug_field='username', read_only=True
+    #)
+    author = UserSerializer(read_only=True)
+    ingredients = IngredientSerializer(many=True)
+    tags = TagSerializer(many=True)
 
     class Meta:
         model = Recipe
         #fields = '__all__'
-        fields = ('id', 'tags', 'author', )#'ingredients', )
+        fields = ('id', 'tags', 'author', 'ingredients', )
 
 
 class SubscribeSerializer(serializers.ModelSerializer):
-    subscribed_to = serializers.SlugRelatedField(
-        slug_field='username',
-        queryset=User.objects.all()
-    )
+    #subscribed_to = serializers.SlugRelatedField(
+    #    slug_field='username',
+    #    queryset=User.objects.all()
+    #)
+    subscribed_to = UserSerializer(read_only=True)
     user = serializers.SlugRelatedField(slug_field='username', read_only=True)
 
     class Meta:

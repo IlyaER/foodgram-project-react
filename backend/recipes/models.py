@@ -8,6 +8,9 @@ class Tag(models.Model):
     color = models.CharField(max_length=7, unique=True)
     slug = models.SlugField(unique=True)
 
+    def __str__(self):
+        return self.name
+
 
 class Ingredients(models.Model):
     """
@@ -27,14 +30,15 @@ class Recipe(models.Model):
         default=None
         )
     text = models.TextField(max_length=1200)
-    ingredient = models.ManyToManyField(
+    ingredients = models.ManyToManyField(
         Ingredients,
         through='RecipeIngredients',
-        related_name='recipe',
+        #related_name='recipe',
     )
-    tag = models.ManyToManyField(
+    tags = models.ManyToManyField(
         Tag,
-        through='RecipesTags'
+        through='RecipesTags',
+        #related_name='recipe',
     )
     cooking_time = models.IntegerField()
 
@@ -43,9 +47,12 @@ class RecipesTags(models.Model):
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
     tag = models.ForeignKey(Tag, on_delete=models.CASCADE)
 
+    def __str__(self):
+        return f'{self.tag} {self.recipe}'
+
 
 class RecipeIngredients(models.Model):
-    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE, related_name='tags')
+    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
     name = models.ForeignKey(Ingredients, on_delete=models.CASCADE)
     quantity = models.CharField(max_length=8)
     #measure = models.CharField(max_length=32)

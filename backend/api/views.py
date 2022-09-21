@@ -26,6 +26,7 @@ class RecipesViewSet(ModelViewSet):
     queryset = Recipe.objects.all()
     serializer_class = RecipeSerializer
 
+
 class SubscribeViewSet(ModelViewSet):
     serializer_class = SubscribeSerializer
 
