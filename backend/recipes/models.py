@@ -33,12 +33,12 @@ class Recipe(models.Model):
     ingredients = models.ManyToManyField(
         Ingredients,
         through='RecipeIngredients',
-        #related_name='recipe',
+        related_name='recipe',
     )
     tags = models.ManyToManyField(
         Tag,
         through='RecipesTags',
-        #related_name='recipe',
+        related_name='recipe',
     )
     cooking_time = models.IntegerField()
 
@@ -52,11 +52,18 @@ class RecipesTags(models.Model):
 
 
 class RecipeIngredients(models.Model):
-    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
-    name = models.ForeignKey(Ingredients, on_delete=models.CASCADE)
-    quantity = models.CharField(max_length=8)
+    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE, related_name='recipes')
+    name = models.ForeignKey(Ingredients, on_delete=models.CASCADE, related_name='ingredients')
+    amount = models.CharField(max_length=8)
     #measure = models.CharField(max_length=32)
 
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['recipe', 'name'],
+                name='unique ingredients'
+            )
+        ]
 
 class Subscribe(models.Model):
     user = models.ForeignKey(
