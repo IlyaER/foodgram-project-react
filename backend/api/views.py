@@ -27,19 +27,19 @@ class RecipesViewSet(ModelViewSet):
     serializer_class = RecipeSerializer
 
     # TODO Tags create: currently set read_only in serializers
-    def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        print(serializer.initial_data)
-        serializer.is_valid(raise_exception=True)
-        print(serializer)
-        self.perform_create(serializer)
-        headers = self.get_success_headers(serializer.data)
-        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
-
-    def perform_create(self, serializer):
-        return serializer.save(
-            #category=category, genre=genre, description=description
-        )
+    #def create(self, request, *args, **kwargs):
+    #    serializer = self.get_serializer(data=request.data)
+    #    print(serializer.initial_data)
+    #    serializer.is_valid(raise_exception=True)
+    #    print(serializer)
+    #    self.perform_create(serializer)
+    #    headers = self.get_success_headers(serializer.data)
+    #    return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+#
+    #def perform_create(self, serializer):
+    #    return serializer.save(
+    #        #category=category, genre=genre, description=description
+    #    )
 
 class SubscribeViewSet(ModelViewSet):
     serializer_class = SubscribeSerializer

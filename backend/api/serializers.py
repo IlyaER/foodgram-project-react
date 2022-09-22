@@ -1,7 +1,19 @@
+from django.core.files.base import ContentFile
 from rest_framework import serializers
 
 from recipes.models import *
 from users.serializers import UserSerializer
+import base64
+
+
+class Base64ImageField(serializers.ImageField):
+    def to_internal_value(self, data):
+        if isinstance(data, str) and data.startswith('data:image'):
+            format, imgstr = data.split(';base64,')
+            ext = format.split('/')[-1]
+            data = ContentFile(base64.b64decode(imgstr), name='temp.' + ext)
+
+        return super().to_internal_value(data)
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -10,13 +22,17 @@ class TagSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'color', 'slug')
         read_only_fields = ('name', 'color', 'slug')
 
-    def validate(self, data):
-        print(data)
-        return data
+
+
 
 
 
 class IngredientSerializer(serializers.ModelSerializer):
+    amount = serializers.SlugRelatedField(
+        slug_field='recipe',
+        queryset=Ingredients.objects.all(),
+        read_only=True
+    )
     class Meta:
         model = Ingredients
         fields = '__all__'
@@ -39,7 +55,14 @@ class RecipeIngredientSerializer(serializers.ModelSerializer):
         model = RecipeIngredients
         #fields = '__all__'
         fields = ('id', 'name', 'measurement_unit', 'amount')
-        read_only_fields = ('name', 'measurement_unit')
+        read_only_fields = ('measurement_unit',)
+
+        extra_kwargs = {
+                    'name': {'source': 'id', 'write_only': True},
+                    #'id': {'write_only': True}
+                }
+
+
 
 
 class RecipeSerializer(serializers.ModelSerializer):
@@ -47,8 +70,10 @@ class RecipeSerializer(serializers.ModelSerializer):
     #    slug_field='username', read_only=True
     #)
     author = UserSerializer(read_only=True)
-    ingredients = RecipeIngredientSerializer(source='recipes', many=True)
-    tags = TagSerializer(many=True, read_only=True)
+    #ingredients = RecipeIngredientSerializer(source='ingredients_to', many=True)
+    ingredients = IngredientSerializer(many=True)
+    tags = TagSerializer(many=True)
+    image = Base64ImageField()
 
     class Meta:
         model = Recipe
@@ -56,7 +81,13 @@ class RecipeSerializer(serializers.ModelSerializer):
         fields = ('id', 'tags', 'author', 'ingredients', 'name', 'image', 'text', 'cooking_time',)
         # TODO "is_favorited": true, "is_in_shopping_cart": true,
 
+    def validate(self, data):
+        print(data)
+        return data
 
+
+    #def create(self, validated_data):
+    #    return validated_data
 
 
 class SubscribeSerializer(serializers.ModelSerializer):
