@@ -64,6 +64,7 @@ class RecipeIngredients(models.Model):
             )
         ]
 
+
 class Subscribe(models.Model):
     user = models.ForeignKey(
         User,

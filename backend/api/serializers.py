@@ -39,6 +39,7 @@ class IngredientSerializer(serializers.ModelSerializer):
     #    queryset=RecipeIngredients.objects.all(),
     #    #source='name_id'
     #)
+    amount = serializers.CharField(read_only=True, source='name.amount')
     class Meta:
         model = Ingredients
         fields = '__all__'
@@ -80,12 +81,22 @@ class RecipeSerializer(serializers.ModelSerializer):
     #ingredients = IngredientSerializer(many=True)
     tags = TagSerializer(many=True)
     image = Base64ImageField()
+    is_favorited = serializers.SerializerMethodField()
+    is_in_shopping_cart = serializers.SerializerMethodField()
 
     class Meta:
         model = Recipe
-        #fields = '__all__'
-        fields = ('id', 'tags', 'author', 'ingredients', 'name', 'image', 'text', 'cooking_time',)
+        fields = '__all__'
+        #fields = ('id', 'tags', 'author', 'ingredients', 'name', 'image', 'text', 'cooking_time', 'is_favorited', 'is_in_shopping_cart')
         # TODO "is_favorited": true, "is_in_shopping_cart": true,
+
+
+    def get_is_favorited(self, obj):
+        return False
+
+
+    def get_is_in_shopping_cart(self, obj):
+        return False
 
     def validate(self, data):
         print(data)
