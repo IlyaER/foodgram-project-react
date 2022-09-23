@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from djoser.views import UserViewSet
 from rest_framework.decorators import action
 from rest_framework.viewsets import GenericViewSet, ModelViewSet, ReadOnlyModelViewSet
 from recipes.models import User
@@ -8,6 +9,17 @@ from rest_framework.response import Response
 
 from .serializers import *
 from recipes.models import *
+
+
+class DjoserUserViewSet(UserViewSet):
+
+    @action(["get"], detail=False)
+    def subscriptions(self, request):
+        return request
+
+    @action(["post", "delete"], detail=True)
+    def subscribe(self, request, id):
+        return id
 
 
 class TagViewSet(ReadOnlyModelViewSet):

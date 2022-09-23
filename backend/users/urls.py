@@ -11,6 +11,7 @@ router = routers.DefaultRouter()
 
 
 urlpatterns = [
-    path('login/', LoginView.as_view(), name='rest_login'),
-    path('logout/', LogoutView.as_view(), name='rest_logout'),
+    path('', include('djoser.urls.authtoken')),
+    #path('login/', LoginView.as_view(), name='rest_login'),
+    #path('logout/', LogoutView.as_view(), name='rest_logout'),
 ]
