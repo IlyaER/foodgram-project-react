@@ -20,7 +20,7 @@ class User(AbstractUser):
     email = models.EmailField(_('email address'), unique=True)
     first_name = models.CharField(_('first name'), max_length=30)
     last_name = models.CharField(_('last name'), max_length=150)
-    is_subscribed = models.BooleanField(default=False)
+    #is_subscribed = models.BooleanField(default=False)
     subscriptions = models.ManyToManyField(
         'User',
         through='recipes.Subscribe',

@@ -112,28 +112,33 @@ class SubscribeSerializer(serializers.ModelSerializer):
     #    slug_field='username',
     #    queryset=User.objects.all()
     #)
-    subscribed_to = UserSerializer(read_only=True)
-    user = serializers.SlugRelatedField(slug_field='username', read_only=True)
-
     class Meta:
-        fields = ('user', 'subscribed_to')
-        model = Subscribe
+        model = User
+        fields = ('email', 'id', 'username', 'first_name', 'last_name', )
 
-    def create(self, validated_data):
-        return Subscribe.objects.create(**validated_data)
 
-    def validate(self, data):
-        user = self.context['request'].user
-        subscribe = data['subscribed_to']
-        if user == subscribe:
-            raise serializers.ValidationError(
-                "Нельзя подписаться на самого себя"
-            )
-        if Subscribe.objects.filter(
-                user=user,
-                subscribed_to=subscribe
-        ).exists():
-            raise serializers.ValidationError(
-                "Вы уже подписаны на этого автора"
-            )
-        return data
+    #subscribed_to = UserSerializer(read_only=True)
+    #user = serializers.SlugRelatedField(slug_field='username', read_only=True)
+#
+    #class Meta:
+    #    fields = ('user', 'subscribed_to')
+    #    model = Subscribe
+#
+    #def create(self, validated_data):
+    #    return Subscribe.objects.create(**validated_data)
+#
+    #def validate(self, data):
+    #    user = self.context['request'].user
+    #    subscribe = data['subscribed_to']
+    #    if user == subscribe:
+    #        raise serializers.ValidationError(
+    #            "Нельзя подписаться на самого себя"
+    #        )
+    #    if Subscribe.objects.filter(
+    #            user=user,
+    #            subscribed_to=subscribe
+    #    ).exists():
+    #        raise serializers.ValidationError(
+    #            "Вы уже подписаны на этого автора"
+    #        )
+    #    return data

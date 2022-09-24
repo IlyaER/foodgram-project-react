@@ -14,7 +14,7 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         #fields = '__all__'
         fields = 'email', 'id', 'username', 'first_name', 'last_name', 'is_subscribed', # TODO is subscribed
-        read_only_fields = 'id',
+        read_only_fields = 'id', 'is_subscribed'
 
     def get_is_subscribed(self, obj):
         user = self.context.get('request').user
