@@ -15,11 +15,17 @@ class DjoserUserViewSet(UserViewSet):
 
     @action(["get"], detail=False)
     def subscriptions(self, request):
-        return request
+        user = self.request.user
+        #queryset = User.objects.filter(email=self.request.user.email)
+        queryset = user.subscriptions.all()
+        serializer = UserSerializer(queryset)
+        return Response(serializer.data)
+        #return self.request.user.subscriber.all()
 
     @action(["post", "delete"], detail=True)
     def subscribe(self, request, id):
         return id
+
 
 
 class TagViewSet(ReadOnlyModelViewSet):

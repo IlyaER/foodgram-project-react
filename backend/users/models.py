@@ -6,6 +6,7 @@ from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
 
 
+
 class CustomUserManager(UserManager):
 
     def get_by_natural_key(self, username):
@@ -20,6 +21,11 @@ class User(AbstractUser):
     first_name = models.CharField(_('first name'), max_length=30)
     last_name = models.CharField(_('last name'), max_length=150)
     is_subscribed = models.BooleanField(default=False)
+    subscriptions = models.ManyToManyField(
+        'User',
+        through='recipes.Subscribe',
+        symmetrical=False
+    )
 
     USER = 'user'
     ADMIN = 'admin'
