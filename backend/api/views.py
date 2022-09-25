@@ -1,7 +1,9 @@
 from django.shortcuts import render
 from djoser.views import UserViewSet as DjoserUserViewSet
 from rest_framework.decorators import action
+from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.status import *
 from rest_framework.viewsets import GenericViewSet, ModelViewSet, ReadOnlyModelViewSet
 from recipes.models import User
 
@@ -27,10 +29,23 @@ class CustomUserViewSet(DjoserUserViewSet):
 
     @action(["post", "delete"], detail=True)
     def subscribe(self, request, id):
-        serializer = SubscribeSerializer(user=self.request.user, subscribed_to=id)
-        if serializer.is_valid():
-            return serializer.save()
-        return id
+        user = self.request.user
+        if request.method == 'DELETE':
+            subscribed_to = Subscribe.objects.filter(
+                user=user,
+                subscribed_to=id
+            )
+            subscribed_to.delete()
+            return Response(status=HTTP_204_NO_CONTENT)
+        serializer = SubscribeSerializer(
+            context={'request': self.request},
+            data={'user': user.id, 'subscribed_to': id}
+        )
+        #print(serializer.initial_data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            return Response(serializer.data, status=HTTP_201_CREATED)
+        return Response(status=HTTP_404_NOT_FOUND)
 
 
 
@@ -67,15 +82,15 @@ class RecipesViewSet(ModelViewSet):
     #    )
 
 
-class SubscribeViewSet(ModelViewSet):
-    serializer_class = SubscribeSerializer
-
-    #permission_classes = (IsAuthenticated, )
-    #filter_backends = (filters.SearchFilter, )
-    search_fields = ('is_subscribed__username',)
-
-    def get_queryset(self):
-        return self.request.user.subscriber.all()
-
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+#class SubscribeViewSet(ModelViewSet):
+#    serializer_class = SubscribeSerializer
+#
+#    #permission_classes = (IsAuthenticated, )
+#    #filter_backends = (filters.SearchFilter, )
+#    search_fields = ('is_subscribed__username',)
+#
+#    def get_queryset(self):
+#        return self.request.user.subscriber.all()
+#
+#    def perform_create(self, serializer):
+#        serializer.save(user=self.request.user)

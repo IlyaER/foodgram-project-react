@@ -131,6 +131,25 @@ class SubscribeSerializer(serializers.ModelSerializer):
         model = Subscribe
         fields = '__all__'
 
+    def create(self, validated_data):
+        return Subscribe.objects.create(**validated_data)
+
+    def validate(self, data):
+        user = self.context['request'].user
+        subscribed_to = data['subscribed_to']
+        if user == subscribed_to:
+            raise serializers.ValidationError(
+                "Нельзя подписаться на самого себя"
+            )
+        if Subscribe.objects.filter(
+                user=user,
+                subscribed_to=subscribed_to
+        ).exists():
+            raise serializers.ValidationError(
+                "Вы уже подписаны на этого автора"
+            )
+        return data
+
 
 #class SubscribeSerializer(serializers.ModelSerializer):
 #    #subscribed_to = serializers.SlugRelatedField(
