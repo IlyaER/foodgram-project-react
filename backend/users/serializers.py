@@ -13,11 +13,13 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         #fields = '__all__'
-        fields = 'email', 'id', 'username', 'first_name', 'last_name', 'is_subscribed', # TODO is subscribed
+        fields = 'email', 'id', 'username', 'first_name', 'last_name', 'is_subscribed',
         read_only_fields = 'id', 'is_subscribed'
 
     def get_is_subscribed(self, obj):
         user = self.context.get('request').user
+        if user.is_anonymous:
+            return False
         return user.subscriptions.filter(id=obj.id).exists()
 
 

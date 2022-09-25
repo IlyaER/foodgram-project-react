@@ -1,6 +1,7 @@
 from django.shortcuts import render
-from djoser.views import UserViewSet
+from djoser.views import UserViewSet as DjoserUserViewSet
 from rest_framework.decorators import action
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import GenericViewSet, ModelViewSet, ReadOnlyModelViewSet
 from recipes.models import User
 
@@ -11,21 +12,24 @@ from .serializers import *
 from recipes.models import *
 
 
-class DjoserUserViewSet(UserViewSet):
+class CustomUserViewSet(DjoserUserViewSet):
+    pagination_class = PageNumberPagination
 
     @action(["get"], detail=False)
     def subscriptions(self, request):
         user = self.request.user
-        #queryset = User.objects.filter(email=self.request.user.email)
         queryset = user.subscriptions.all()
-
-        serializer = SubscribeSerializer(queryset, many=True, )#context={'request': request})
-        return Response(serializer.data)
+        page = self.paginate_queryset(queryset)
+        serializer = SubscriptionSerializer(page, many=True, context={'request': request})
+        return self.get_paginated_response(serializer.data)
+        #return Response(serializer.data)
         #return self.request.user.subscriber.all()
 
     @action(["post", "delete"], detail=True)
     def subscribe(self, request, id):
-
+        serializer = SubscribeSerializer(user=self.request.user, subscribed_to=id)
+        if serializer.is_valid():
+            return serializer.save()
         return id
 
 
@@ -45,6 +49,7 @@ class IngredientViewSet(ReadOnlyModelViewSet):
 class RecipesViewSet(ModelViewSet):
     queryset = Recipe.objects.all()
     serializer_class = RecipeSerializer
+    #permission_classes = (IsAuthenticated,)
 
     # TODO Tags create: currently set read_only in serializers
     #def create(self, request, *args, **kwargs):
@@ -60,6 +65,7 @@ class RecipesViewSet(ModelViewSet):
     #    return serializer.save(
     #        #category=category, genre=genre, description=description
     #    )
+
 
 class SubscribeViewSet(ModelViewSet):
     serializer_class = SubscribeSerializer

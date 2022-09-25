@@ -86,8 +86,8 @@ class RecipeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Recipe
-        fields = '__all__'
-        #fields = ('id', 'tags', 'author', 'ingredients', 'name', 'image', 'text', 'cooking_time', 'is_favorited', 'is_in_shopping_cart')
+        #fields = '__all__'
+        fields = ('id', 'tags', 'author', 'ingredients', 'name', 'image', 'text', 'cooking_time', 'is_favorited', 'is_in_shopping_cart')
         # TODO "is_favorited": true, "is_in_shopping_cart": true,
 
 
@@ -107,14 +107,45 @@ class RecipeSerializer(serializers.ModelSerializer):
     #    return validated_data
 
 
-class SubscribeSerializer(serializers.ModelSerializer):
-    #subscribed_to = serializers.SlugRelatedField(
-    #    slug_field='username',
-    #    queryset=User.objects.all()
-    #)
+class ShortRecipeSerializer(RecipeSerializer):
+    class Meta:
+        model = Recipe
+        fields = ('id', 'name', 'image', 'cooking_time')
+
+
+class SubscriptionSerializer(UserSerializer):
+    recipes = ShortRecipeSerializer(source='recipe', many=True, read_only=True)
+    recipes_count = serializers.SerializerMethodField()
+
     class Meta:
         model = User
-        fields = ('email', 'id', 'username', 'first_name', 'last_name', )
+        fields = 'email', 'id', 'username', 'first_name', 'last_name', 'is_subscribed', 'recipes', 'recipes_count'
+        read_only_fields = 'id', 'is_subscribed',
+
+    def get_recipes_count(self, obj):
+        return obj.recipe.count()
+
+
+class SubscribeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Subscribe
+        fields = '__all__'
+
+
+#class SubscribeSerializer(serializers.ModelSerializer):
+#    #subscribed_to = serializers.SlugRelatedField(
+#    #    slug_field='username',
+#    #    queryset=User.objects.all()
+#    #)
+#    is_subscribed = serializers.SerializerMethodField()
+#
+#    class Meta:
+#        model = User
+#        fields = ('email', 'id', 'username', 'first_name', 'last_name', 'is_subscribed')
+#
+#    def get_is_subscribed(self, obj):
+#        user = self.context['request'].user
+#        return user.subscriptions.filter(id=obj.id).exists()
 
 
     #subscribed_to = UserSerializer(read_only=True)
