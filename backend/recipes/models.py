@@ -65,6 +65,10 @@ class RecipeIngredients(models.Model):
         ]
 
 
+class Favorite(models.Model):
+    pass
+
+
 class Subscribe(models.Model):
     user = models.ForeignKey(
         User,

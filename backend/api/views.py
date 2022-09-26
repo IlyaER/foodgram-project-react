@@ -31,10 +31,11 @@ class CustomUserViewSet(DjoserUserViewSet):
     def subscribe(self, request, id):
         user = self.request.user
         if request.method == 'DELETE':
-            subscribed_to = Subscribe.objects.filter(
-                user=user,
-                subscribed_to=id
-            )
+            #subscribed_to = Subscribe.objects.filter(
+            #    user=user,
+            #    subscribed_to=id
+            #)
+            subscribed_to = get_object_or_404(Subscribe, user=user, subscribed_to=id)
             subscribed_to.delete()
             return Response(status=HTTP_204_NO_CONTENT)
         serializer = SubscribeSerializer(
@@ -44,6 +45,9 @@ class CustomUserViewSet(DjoserUserViewSet):
         #print(serializer.initial_data)
         if serializer.is_valid(raise_exception=True):
             serializer.save()
+            # при подписке переводим на страницу с подписками, но без пагинатора
+            queryset = user.subscriptions.all()
+            serializer = SubscriptionSerializer(queryset, many=True, context={'request': request})
             return Response(serializer.data, status=HTTP_201_CREATED)
         return Response(status=HTTP_404_NOT_FOUND)
 
@@ -81,6 +85,11 @@ class RecipesViewSet(ModelViewSet):
     #        #category=category, genre=genre, description=description
     #    )
 
+    @action(["post", "delete"], detail=True)
+    def favorite(self, request, pk):
+        print(request)
+        print(pk)
+        return Response(pk)
 
 #class SubscribeViewSet(ModelViewSet):
 #    serializer_class = SubscribeSerializer
