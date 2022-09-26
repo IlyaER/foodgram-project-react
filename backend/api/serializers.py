@@ -92,7 +92,10 @@ class RecipeSerializer(serializers.ModelSerializer):
 
 
     def get_is_favorited(self, obj):
-        return False
+        user = self.context.get('request').user
+        if user.is_anonymous:
+            return False
+        return user.favorite.filter(favorite_recipe_id=obj.id).exists()
 
 
     def get_is_in_shopping_cart(self, obj):
@@ -169,5 +172,24 @@ class FavoriteSerializer(serializers.ModelSerializer):
         ).exists():
             raise serializers.ValidationError(
                 "Рецепт уже в избранном"
+            )
+        return data
+
+
+class CartSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Cart
+        fields = '__all__'
+
+
+    def validate(self, data):
+        user = self.context['request'].user
+        cart_recipe = data['cart_recipe']
+        if Cart.objects.filter(
+                user=user,
+                cart_recipe=cart_recipe
+        ).exists():
+            raise serializers.ValidationError(
+                "Рецепт уже в корзине"
             )
         return data

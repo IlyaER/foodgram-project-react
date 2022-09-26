@@ -27,7 +27,7 @@ class CustomUserViewSet(DjoserUserViewSet):
         #return Response(serializer.data)
         #return self.request.user.subscriber.all()
 
-    @action(["post", "delete"], detail=True)
+    @action(["post", "delete"], permission_classes=[IsAuthenticated], detail=True)
     def subscribe(self, request, id):
         user = self.request.user
         if request.method == 'DELETE':
@@ -85,6 +85,26 @@ class RecipesViewSet(ModelViewSet):
     #        #category=category, genre=genre, description=description
     #    )
 
+    @action(["post", "delete"], permission_classes=[IsAuthenticated], detail=True)
+    def shopping_cart(self, request, pk):
+        user = self.request.user
+        if request.method == 'DELETE':
+            cart_recipe = get_object_or_404(Cart, user=user, cart_recipe=pk)
+            cart_recipe.delete()
+            return Response(status=HTTP_204_NO_CONTENT)
+        serializer = CartSerializer(
+            context={'request': self.request},
+            data={'user': user.id, 'cart_recipe': pk}
+        )
+        #print(serializer.initial_data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            # TODO: при подписке переводим на страницу с рецептом
+            #queryset = Recipe.objects.all()
+            #serializer = ShortRecipeSerializer(queryset, source='recipe', many=True, read_only=True, context={'request': request})
+            return Response(serializer.data, status=HTTP_201_CREATED)
+        return Response(status=HTTP_404_NOT_FOUND)
+
 
     @action(["post", "delete"], permission_classes=[IsAuthenticated], detail=True)
     def favorite(self, request, pk):
@@ -97,7 +117,7 @@ class RecipesViewSet(ModelViewSet):
             context={'request': self.request},
             data={'user': user.id, 'favorite_recipe': pk}
         )
-        print(serializer.initial_data)
+        #print(serializer.initial_data)
         if serializer.is_valid(raise_exception=True):
             serializer.save()
             # TODO: при подписке переводим на страницу с рецептом
@@ -106,11 +126,6 @@ class RecipesViewSet(ModelViewSet):
             return Response(serializer.data, status=HTTP_201_CREATED)
         return Response(status=HTTP_404_NOT_FOUND)
 
-
-
-        print(request)
-        print(pk)
-        return Response(pk)
 
 #class SubscribeViewSet(ModelViewSet):
 #    serializer_class = SubscribeSerializer
