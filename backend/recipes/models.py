@@ -66,7 +66,16 @@ class RecipeIngredients(models.Model):
 
 
 class Favorite(models.Model):
-    pass
+    user = models.ForeignKey(User, on_delete=models.CASCADE,)
+    favorite_recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE,)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['user', 'favorite_recipe'],
+                name='unique favorites'
+            )
+        ]
 
 
 class Subscribe(models.Model):

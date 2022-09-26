@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from djoser.views import UserViewSet as DjoserUserViewSet
-from rest_framework.decorators import action
+from rest_framework.decorators import action, permission_classes
 from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.status import *
@@ -85,8 +85,29 @@ class RecipesViewSet(ModelViewSet):
     #        #category=category, genre=genre, description=description
     #    )
 
-    @action(["post", "delete"], detail=True)
+
+    @action(["post", "delete"], permission_classes=[IsAuthenticated], detail=True)
     def favorite(self, request, pk):
+        user = self.request.user
+        if request.method == 'DELETE':
+            favorite_recipe = get_object_or_404(Favorite, user=user, favorite_recipe=pk)
+            favorite_recipe.delete()
+            return Response(status=HTTP_204_NO_CONTENT)
+        serializer = FavoriteSerializer(
+            context={'request': self.request},
+            data={'user': user.id, 'favorite_recipe': pk}
+        )
+        print(serializer.initial_data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            # TODO: при подписке переводим на страницу с рецептом
+            #queryset = Recipe.objects.all()
+            #serializer = ShortRecipeSerializer(queryset, source='recipe', many=True, read_only=True, context={'request': request})
+            return Response(serializer.data, status=HTTP_201_CREATED)
+        return Response(status=HTTP_404_NOT_FOUND)
+
+
+
         print(request)
         print(pk)
         return Response(pk)

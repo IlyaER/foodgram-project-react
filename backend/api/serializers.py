@@ -113,6 +113,9 @@ class ShortRecipeSerializer(RecipeSerializer):
         fields = ('id', 'name', 'image', 'cooking_time')
 
 
+
+
+
 class SubscriptionSerializer(UserSerializer):
     recipes = ShortRecipeSerializer(source='recipe', many=True, read_only=True)
     recipes_count = serializers.SerializerMethodField()
@@ -131,8 +134,8 @@ class SubscribeSerializer(serializers.ModelSerializer):
         model = Subscribe
         fields = '__all__'
 
-    def create(self, validated_data):
-        return Subscribe.objects.create(**validated_data)
+    #def create(self, validated_data):
+    #    return Subscribe.objects.create(**validated_data)
 
     def validate(self, data):
         user = self.context['request'].user
@@ -151,3 +154,20 @@ class SubscribeSerializer(serializers.ModelSerializer):
         return data
 
 
+class FavoriteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Favorite
+        fields = '__all__'
+
+
+    def validate(self, data):
+        user = self.context['request'].user
+        favorite_recipe = data['favorite_recipe']
+        if Favorite.objects.filter(
+                user=user,
+                favorite_recipe=favorite_recipe
+        ).exists():
+            raise serializers.ValidationError(
+                "Рецепт уже в избранном"
+            )
+        return data
