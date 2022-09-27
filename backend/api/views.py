@@ -72,9 +72,9 @@ class RecipesViewSet(ModelViewSet):
 
     # TODO Tags create: currently set read_only in serializers
     def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        #serializer = RecipeWriteSerializer(data=request.data)
-        print(f'Initial data (viewset create method):{serializer.initial_data}')
+        #serializer = self.get_serializer(data=request.data)
+        serializer = RecipeWriteSerializer(data=request.data)
+        #print(f'Initial data (viewset create method):{serializer.initial_data}')
         #ingredients = serializer.initial_data.pop('ingredients')
         serializer.is_valid(raise_exception=True)
         #print(serializer)

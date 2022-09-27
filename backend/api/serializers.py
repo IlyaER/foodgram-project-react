@@ -62,19 +62,54 @@ class RecipeIngredientSerializer(serializers.ModelSerializer):
         model = RecipeIngredients
         #fields = '__all__'
         fields = ('id', 'name', 'measurement_unit', 'amount')
-        read_only_fields = ('name', 'measurement_unit',)
+        #read_only_fields = ('id', 'measurement_unit',)
 
         #extra_kwargs = {
         #            'name': {'source': 'id', 'write_only': True},
         #            #'id': {'write_only': True}
         #        }
 
+    def validate(self, attrs):
+        print(f'RecipeIngred Attrs: {attrs}')
+        #print(f'RecipeIngred Attrs: {self.initial_data}')
+        return attrs
+
+class RecipeIngredientWriteSerializer(serializers.ModelSerializer):
+    #id = serializers.SlugRelatedField(
+    #    slug_field='id',
+    #    source='name',
+    #    #read_only=True
+    #    queryset=Ingredients.objects.all()
+    #)
+    id = serializers.PrimaryKeyRelatedField(source='name' ,queryset=Ingredients.objects.all())
+
+    class Meta:
+        model = RecipeIngredients
+        fields = ('amount', 'id',)
+        extra_kwargs = {
+            'name': {'source': 'id',}# 'write_only': True},
+            #'id': {'write_only': True},
+        }
 
 class RecipeWriteSerializer(serializers.ModelSerializer):
+    #author = UserSerializer(read_only=True)
+    ingredients = RecipeIngredientWriteSerializer(source='ingredients_to', many=True)
+    tags = TagSerializer(many=True, read_only=True)
+    image = Base64ImageField()
+
     class Meta:
         model = Recipe
-        fields = ('name', )#'__all__', )
+        fields = ('id', 'tags', 'ingredients', 'name', 'image', 'text', 'cooking_time',)#'__all__', )
 
+    #def validate(self, attrs):
+    #    print(f'Attrs: {attrs}')
+    #    print(self.initial_data)
+    #    return attrs
+
+    def create(self, validated_data):
+        print(f'Initial data: {self.initial_data}')
+        print(f'Validated data: {validated_data}')
+        return validated_data
 
 class RecipeSerializer(serializers.ModelSerializer):
     #def __init__(self, *args, **kwargs):
