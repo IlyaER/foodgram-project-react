@@ -54,7 +54,7 @@ class RecipesTags(models.Model):
 class RecipeIngredients(models.Model):
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE, related_name='ingredients_to')
     name = models.ForeignKey(Ingredients, on_delete=models.CASCADE, related_name='recipes')
-    amount = models.CharField(max_length=8)
+    amount = models.CharField(max_length=8,)
 
     class Meta:
         constraints = [

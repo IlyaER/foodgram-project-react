@@ -62,36 +62,51 @@ class RecipeIngredientSerializer(serializers.ModelSerializer):
         model = RecipeIngredients
         #fields = '__all__'
         fields = ('id', 'name', 'measurement_unit', 'amount')
-        read_only_fields = ('measurement_unit',)
+        read_only_fields = ('name', 'measurement_unit',)
 
-        extra_kwargs = {
-                    'name': {'source': 'id', 'write_only': True},
-                    #'id': {'write_only': True}
-                }
+        #extra_kwargs = {
+        #            'name': {'source': 'id', 'write_only': True},
+        #            #'id': {'write_only': True}
+        #        }
 
 
+class RecipeWriteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Recipe
+        fields = ('name', )#'__all__', )
 
 
 class RecipeSerializer(serializers.ModelSerializer):
+    #def __init__(self, *args, **kwargs):
+    #    super().__init__(*args, **kwargs)
+    #    if 'request' in self.context and self.context['request'].method == 'GET':
+    #        self.fields['is_favorited'] = serializers.SerializerMethodField(read_only=True)
+    #        self.fields['is_in_shopping_cart'] = serializers.SerializerMethodField(read_only=True)
+
     #author = serializers.SlugRelatedField(
     #    slug_field='username', read_only=True
     #)
     author = UserSerializer(read_only=True)
     ingredients = RecipeIngredientSerializer(source='ingredients_to', many=True)
     #ingredients = IngredientSerializer(many=True)
-    tags = TagSerializer(many=True)
+    tags = TagSerializer(many=True, read_only=True)
     image = Base64ImageField()
-    is_favorited = serializers.SerializerMethodField()
-    is_in_shopping_cart = serializers.SerializerMethodField()
+    is_favorited = serializers.SerializerMethodField(read_only=True)
+    is_in_shopping_cart = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Recipe
         #fields = '__all__'
         fields = ('id', 'tags', 'author', 'ingredients', 'name', 'image', 'text', 'cooking_time', 'is_favorited', 'is_in_shopping_cart')
-        # TODO "is_favorited": true, "is_in_shopping_cart": true,
-
+        read_only_fields = ('id', 'is_favorited', 'is_in_shopping_cart')
+        #extra_kwargs = {
+        #    'ingredients': {'source': 'recipes', 'write_only': True},
+        #}
 
     def get_is_favorited(self, obj):
+    #    pass
+        if 'request' in self.context and self.context['request'].method != 'GET':
+            return False
         user = self.context.get('request').user
         if user.is_anonymous:
             return False
@@ -99,15 +114,25 @@ class RecipeSerializer(serializers.ModelSerializer):
 
 
     def get_is_in_shopping_cart(self, obj):
-        return False
+    #    pass
+        if 'request' in self.context and self.context['request'].method != 'GET':
+            return False
+        user = self.context.get('request').user
+        if user.is_anonymous:
+            return False
+        return user.shopping_cart.filter(cart_recipe_id=obj.id).exists()
 
-    def validate(self, data):
-        print(data)
-        return data
+
+    def validate(self, attrs):
+        print(f'Attrs: {attrs}')
+        print(self.initial_data)
+        return attrs
 
 
-    #def create(self, validated_data):
-    #    return validated_data
+    def create(self, validated_data):
+        print(f'Initial data: {self.initial_data}')
+        print(f'Validated data: {validated_data}')
+        return validated_data
 
 
 class ShortRecipeSerializer(RecipeSerializer):
