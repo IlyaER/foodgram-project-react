@@ -86,10 +86,10 @@ class RecipeIngredientWriteSerializer(serializers.ModelSerializer):
     class Meta:
         model = RecipeIngredients
         fields = ('amount', 'id',)
-        extra_kwargs = {
-            'name': {'source': 'id',}# 'write_only': True},
-            #'id': {'write_only': True},
-        }
+        #extra_kwargs = {
+        #    'name': {'source': 'id',}# 'write_only': True},
+        #    #'id': {'write_only': True},
+        #}
 
 class RecipeWriteSerializer(serializers.ModelSerializer):
     #author = UserSerializer(read_only=True)
@@ -113,7 +113,16 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
         ingredients = validated_data.pop('ingredients_to')
         tags = validated_data.pop('tags')
         recipe = Recipe.objects.create(**validated_data)
+        print(ingredients)
+        print(recipe)
+        print(tags)
+        for ingredient in ingredients:
+            RecipeIngredients.objects.create(
+                **ingredient, recipe_id=recipe.id)
+        for tag in tags:
+            RecipesTags.objects.create(**tag, recipe_id=recipe.id)
         return recipe #validated_data
+
 
 class RecipeSerializer(serializers.ModelSerializer):
     #def __init__(self, *args, **kwargs):
