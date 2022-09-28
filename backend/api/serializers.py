@@ -81,7 +81,7 @@ class RecipeIngredientWriteSerializer(serializers.ModelSerializer):
     #    #read_only=True
     #    queryset=Ingredients.objects.all()
     #)
-    id = serializers.PrimaryKeyRelatedField(source='name' ,queryset=Ingredients.objects.all())
+    id = serializers.PrimaryKeyRelatedField(source='name', queryset=Ingredients.objects.all())
 
     class Meta:
         model = RecipeIngredients
@@ -94,7 +94,8 @@ class RecipeIngredientWriteSerializer(serializers.ModelSerializer):
 class RecipeWriteSerializer(serializers.ModelSerializer):
     #author = UserSerializer(read_only=True)
     ingredients = RecipeIngredientWriteSerializer(source='ingredients_to', many=True)
-    tags = TagSerializer(many=True, read_only=True)
+    #tags = TagSerializer(many=True)
+    tags = serializers.PrimaryKeyRelatedField(queryset=Tag.objects.all(), many=True)
     image = Base64ImageField()
 
     class Meta:
@@ -109,7 +110,10 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         print(f'Initial data: {self.initial_data}')
         print(f'Validated data: {validated_data}')
-        return validated_data
+        ingredients = validated_data.pop('ingredients_to')
+        tags = validated_data.pop('tags')
+        recipe = Recipe.objects.create(**validated_data)
+        return recipe #validated_data
 
 class RecipeSerializer(serializers.ModelSerializer):
     #def __init__(self, *args, **kwargs):
