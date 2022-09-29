@@ -52,12 +52,13 @@ class RecipeIngredientSerializer(serializers.ModelSerializer):
         read_only=True
     )
     #measurement_unit = IngredientSerializer(source='name')
-    measurement_unit = serializers.SlugRelatedField(
-        source='name',
-        slug_field='measurement_unit',
-        #queryset=Ingredients.objects.all(),
-        read_only=True,
-    )
+    #measurement_unit = serializers.SlugRelatedField(
+    #    source='name',
+    #    slug_field='measurement_unit',
+    #    #queryset=Ingredients.objects.all(),
+    #    read_only=True,
+    #)
+    measurement_unit = serializers.CharField(source='name.measurement_unit')
 
     class Meta:
         model = RecipeIngredients
@@ -114,7 +115,7 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
         ingredients = validated_data.pop('ingredients_to')
         tags = validated_data.pop('tags')
         recipe = Recipe.objects.create(**validated_data)
-        print(ingredients)
+        print(f'ingredients {ingredients}')
         print(recipe)
         print(tags)
         for ingredient in ingredients:
@@ -122,35 +123,55 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
                 **ingredient, recipe_id=recipe.id)
         for tag in tags:
             RecipesTags.objects.create(tag=tag, recipe_id=recipe.id)
+        print(f'Recipe: {recipe}')
         return recipe #validated_data
 
+
     def update(self, instance, validated_data):
-        info = model_meta.get_field_info(instance)
-        m2m_fields = []
-        for attr, value in validated_data.items():
-            if attr in info.relations and info.relations[attr].to_many:
-                m2m_fields.append((attr, value))
-            else:
-                setattr(instance, attr, value)
+        #info = model_meta.get_field_info(instance)
+        #m2m_fields = []
+        #for attr, value in validated_data.items():
+        #    if attr in info.relations and info.relations[attr].to_many:
+        #        m2m_fields.append((attr, value))
+        #    else:
+        #        setattr(instance, attr, value)
+#
+        #instance.save()
+        #for attr, value in m2m_fields:
+        #    field = getattr(instance, attr)
+        #    field.set(value)
+#
+        #return instance
+        instance.image = validated_data.get(
+            'image', instance.image)
+        instance.name = validated_data.get(
+            'name', instance.name)
+        print(instance.tags)
+        print(validated_data)
+        if validated_data.get('tags'):
+            instance.tags.clear()
+            instance.tags.set(validated_data.pop('tags'))
 
+            #tags = validated_data.pop('tags')
+            #for tag in tags:
+            #    RecipesTags.objects.create(tag=tag, recipe_id=instance.id)
+        print(instance.tags)
+        if validated_data.get('ingredients_to'):
+            #TODO some strange things with ingredients
+            # #instance.ingredients_to.clear()
+            RecipeIngredients.objects.filter(recipe=instance).all().delete()
+            ingredients = validated_data.pop('ingredients_to')
+            print(ingredients)
+            for ingredient in ingredients:
+                RecipeIngredients.objects.create(
+                    **ingredient, recipe_id=instance.id)
+            #RecipeIngredients.objects.create(**ingredients)#, recipe_id=recipe.id)
+            #instance.ingredients.set(validated_data.pop('ingredients_to'))
+        print(f'Last validated data: {validated_data}')
         instance.save()
-        for attr, value in m2m_fields:
-            field = getattr(instance, attr)
-            field.set(value)
-
-        return instance
-        #print(instance.tags)
-        #print(validated_data)
-        #if validated_data.get('tags'):
-        #    print(validated_data)
-        #    instance.tags.clear()
-        #    instance.tags.set(validated_data.pop('tags'))
-        #print(instance.tags)
-        #if validated_data.get('ingredients'):
-        #    instance.ingredients.clear()
-        #    instance.ingredients.set(validated_data.pop('ingredients'))
         #recipe = Recipe.objects.update(**validated_data)
-        #return recipe
+        #print(f'Recipe: {recipe}')
+        return instance
 
 
 class RecipeSerializer(serializers.ModelSerializer):

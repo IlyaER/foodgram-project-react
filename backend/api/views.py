@@ -75,7 +75,8 @@ class RecipesViewSet(ModelViewSet):
         print(self.action)
         #if self.action == 'list': # retrieve
         #    return self.serializer_class
-        if self.action == ('partial_update' or 'create'):
+        if self.action == 'partial_update' or self.action == 'create':
+            print('RecipeWriteSerializer')
             return RecipeWriteSerializer
         return self.serializer_class
 
