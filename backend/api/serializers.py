@@ -1,5 +1,6 @@
 from django.core.files.base import ContentFile
 from rest_framework import serializers
+from rest_framework.utils import model_meta
 
 from recipes.models import *
 from users.serializers import UserSerializer
@@ -120,8 +121,36 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
             RecipeIngredients.objects.create(
                 **ingredient, recipe_id=recipe.id)
         for tag in tags:
-            RecipesTags.objects.create(**tag, recipe_id=recipe.id)
+            RecipesTags.objects.create(tag=tag, recipe_id=recipe.id)
         return recipe #validated_data
+
+    def update(self, instance, validated_data):
+        info = model_meta.get_field_info(instance)
+        m2m_fields = []
+        for attr, value in validated_data.items():
+            if attr in info.relations and info.relations[attr].to_many:
+                m2m_fields.append((attr, value))
+            else:
+                setattr(instance, attr, value)
+
+        instance.save()
+        for attr, value in m2m_fields:
+            field = getattr(instance, attr)
+            field.set(value)
+
+        return instance
+        #print(instance.tags)
+        #print(validated_data)
+        #if validated_data.get('tags'):
+        #    print(validated_data)
+        #    instance.tags.clear()
+        #    instance.tags.set(validated_data.pop('tags'))
+        #print(instance.tags)
+        #if validated_data.get('ingredients'):
+        #    instance.ingredients.clear()
+        #    instance.ingredients.set(validated_data.pop('ingredients'))
+        #recipe = Recipe.objects.update(**validated_data)
+        #return recipe
 
 
 class RecipeSerializer(serializers.ModelSerializer):
