@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet as DjoserUserViewSet
 from rest_framework.decorators import action, permission_classes
 from rest_framework.generics import get_object_or_404
@@ -10,6 +11,7 @@ from rest_framework.viewsets import GenericViewSet, ModelViewSet, ReadOnlyModelV
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 
+from recipes.filters import RecipeFilter
 from .serializers import *
 from recipes.models import *
 
@@ -68,6 +70,8 @@ class RecipeViewSet(ModelViewSet):
     queryset = Recipe.objects.all()
     serializer_class = RecipeSerializer
     #permission_classes = (IsAuthenticated,)
+    filterset_class = RecipeFilter
+    filter_backends = (DjangoFilterBackend,)
 
     # TODO Tags create: currently set read_only in serializers
     def get_serializer_class(self):
@@ -79,12 +83,12 @@ class RecipeViewSet(ModelViewSet):
             return RecipeWriteSerializer
         return self.serializer_class
 
-    def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
-        headers = self.get_success_headers(serializer.data)
-        #return Response(serializer.data, status=HTTP_201_CREATED, headers=headers)
+    #def create(self, request, *args, **kwargs):
+    #    serializer = self.get_serializer(data=request.data)
+    #    serializer.is_valid(raise_exception=True)
+    #    self.perform_create(serializer)
+    #    headers = self.get_success_headers(serializer.data)
+    #    #return Response(serializer.data, status=HTTP_201_CREATED, headers=headers)
 
 
     def perform_create(self, serializer):
