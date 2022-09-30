@@ -14,17 +14,18 @@ class IngredientFilter(filters.FilterSet):
 
 
 class RecipeFilter(filters.FilterSet):
+    #is_in_shopping_cart = filters.CharFilter(method='cart')
     is_in_shopping_cart = filters.CharFilter(method='cart')
     is_favorited = filters.CharFilter(method='favorites')
     tags = filters.AllValuesMultipleFilter(field_name='tags__slug',)
     class Meta:
         model = Recipe
-        fields = ('tags', 'author')
+        fields = ('author', )
 
     def cart(self, queryset, name, value):
-        print(queryset, name, value)
+        #print(queryset, name, value)
         queryset = queryset.filter(shopping_cart__user=self.request.user)
-        print(queryset)
+        #print(queryset)
         return queryset
 
     def favorites(self, queryset, name, value):
