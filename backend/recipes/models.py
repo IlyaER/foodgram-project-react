@@ -42,6 +42,12 @@ class Recipe(models.Model):
     )
     cooking_time = models.IntegerField()
 
+    date_added = models.DateTimeField(auto_now=True)
+
+    #@property
+    #def fav_count(self):
+    #    return self.favorite.aggregate(models.Count('id'))['id__count'] #obj.favorite.count()
+
 
 class RecipeTag(models.Model):
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
