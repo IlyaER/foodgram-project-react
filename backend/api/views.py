@@ -11,7 +11,7 @@ from rest_framework.viewsets import GenericViewSet, ModelViewSet, ReadOnlyModelV
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 
-from recipes.filters import RecipeFilter
+from recipes.filters import *
 from .serializers import *
 from recipes.models import *
 
@@ -64,6 +64,7 @@ class IngredientViewSet(ReadOnlyModelViewSet):
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
     paginator = None
+    filterset_class = IngredientFilter
 
 
 class RecipeViewSet(ModelViewSet):
@@ -71,7 +72,7 @@ class RecipeViewSet(ModelViewSet):
     serializer_class = RecipeSerializer
     #permission_classes = (IsAuthenticated,)
     filterset_class = RecipeFilter
-    filter_backends = (DjangoFilterBackend,)
+    #filter_backends = (DjangoFilterBackend,)
 
     # TODO Tags create: currently set read_only in serializers
     def get_serializer_class(self):
