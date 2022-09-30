@@ -12,7 +12,7 @@ class Tag(models.Model):
         return self.name
 
 
-class Ingredients(models.Model):
+class Ingredient(models.Model):
     """
     Список всех возможных составных частей для блюд
     """
@@ -31,19 +31,19 @@ class Recipe(models.Model):
         )
     text = models.TextField(max_length=1200)
     ingredients = models.ManyToManyField(
-        Ingredients,
-        through='RecipeIngredients',
-        related_name='recipe',
+        Ingredient,
+        through='RecipeIngredient',
+        related_name='recipes',
     )
     tags = models.ManyToManyField(
         Tag,
-        through='RecipesTags',
-        related_name='recipe',
+        through='RecipeTag',
+        related_name='recipes',
     )
     cooking_time = models.IntegerField()
 
 
-class RecipesTags(models.Model):
+class RecipeTag(models.Model):
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
     tag = models.ForeignKey(Tag, on_delete=models.CASCADE)
 
@@ -51,15 +51,15 @@ class RecipesTags(models.Model):
         return f'{self.tag} {self.recipe}'
 
 
-class RecipeIngredients(models.Model):
-    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE, related_name='ingredients_to')
-    name = models.ForeignKey(Ingredients, on_delete=models.CASCADE, related_name='recipes')
-    amount = models.IntegerField(blank=False)
+class RecipeIngredient(models.Model):
+    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE, related_name='ingredient')
+    ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE, related_name='recipe')
+    amount = models.IntegerField(blank=False,)
 
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=['recipe', 'name'],
+                fields=['recipe', 'ingredient'],
                 name='unique ingredients'
             )
         ]

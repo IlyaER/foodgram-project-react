@@ -46,7 +46,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AddField(
             model_name='recipeingredients',
-            name='name',
+            name='ingredient',
             field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='recipes.Ingredients'),
         ),
         migrations.AddField(
