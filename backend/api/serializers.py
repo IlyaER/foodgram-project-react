@@ -55,22 +55,6 @@ class RecipeIngredientSerializer(serializers.ModelSerializer):
             'id', 'name', 'measurement_unit', 'amount')
 
 
-#    #name = serializers.SlugRelatedField(
-#    #    slug_field='name',
-#    #    read_only=True
-#    #)
-#    #amount = serializers.CharField(source='recipeingredient.amount')
-#    measurement_unit = serializers.CharField()
-#    name = serializers.CharField()
-#
-#    class Meta:
-#        model = RecipeIngredient
-#        #fields = '__all__'
-#        fields = ('id', 'name', 'measurement_unit', 'amount', )
-
-
-
-
 class RecipeIngredientWriteSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField()
     amount = serializers.IntegerField()
@@ -78,20 +62,6 @@ class RecipeIngredientWriteSerializer(serializers.ModelSerializer):
     class Meta:
         model = RecipeIngredient
         fields = ('id', 'amount')
-
-
-#class RecipeIngredientWriteSerializer(serializers.ModelSerializer):
-#    id = serializers.SlugRelatedField(
-#        slug_field='id',
-#        source='name',
-#        #read_only=True
-#        queryset=Ingredients.objects.all()
-#    )
-#    #id = serializers.PrimaryKeyRelatedField(source='name', queryset=Ingredients.objects.all(), write_only=True)
-#
-#    class Meta:
-#        model = RecipeIngredients
-#        fields = ('amount', 'id',)
 
 
 class RecipeWriteSerializer(serializers.ModelSerializer):
@@ -114,16 +84,7 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
         print(f'ingredients {ingredients}')
         print(recipe)
         print(tags)
-        #elements = []
-        #for ingredient in ingredients:
-        #    elements.append(
-        #        RecipeIngredient(
-        #            recipe=recipe,
-        #            name_id=ingredient.get("id"),
-        #            amount=ingredient.get("amount"),
-        #        )
-        #    )
-        #RecipeIngredient.objects.bulk_create(elements)
+
         for ingredient in ingredients:
             RecipeIngredient.objects.create(
                 ingredient_id=ingredient.get("id"),
@@ -150,11 +111,9 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
         print(validated_data)
         if validated_data.get('tags'):
             instance.tags.clear()
-            instance.tags.set(validated_data.pop('tags'))
-
-            #tags = validated_data.pop('tags')
-            #for tag in tags:
-            #    RecipesTags.objects.create(tag=tag, recipe_id=instance.id)
+            tags = validated_data.pop('tags')
+            for tag in tags:
+                RecipeTag.objects.create(tag=tag, recipe_id=instance.id)
         print(instance.tags)
         ingredients = validated_data.pop('ingredient')
         print(ingredients)
@@ -167,41 +126,8 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
                 recipe=instance
             )
 
-            #ingredients = validated_data.pop('ingredients')
-            #instance.ingredients.clear()
-            #elements = []
-            #for ingredient in ingredients:
-            #    elements.append(
-            #        RecipeIngredient(
-            #            recipe=instance,
-            #            name_id=ingredient.get("id"),
-            #            amount=ingredient.get("amount"),
-            #        )
-            #    )
-            #RecipeIngredient.objects.bulk_create(elements)
-        #    #TODO some strange things with ingredients
-        #    # #instance.ingredients_to.clear()
-        #    #RecipeIngredients.objects.filter(recipe=instance).all().delete()
-        #    ingredients = validated_data.pop('ingredients_to')
-        #    print(ingredients)
-        #    for ingredient in ingredients:
-        #        print(instance.id, ingredient)
-        #        amount = ingredient['amount']
-        #        #RecipeIngredients.objects.update_or_create(
-        #        #    ingredient['name'],
-        #        #    amount=amount,
-        #        #    recipe_id=instance.id
-        #        #)
-        #        ingredient = RecipeIngredients.objects.get_or_create(pk=ingredient['name'].id)
-        #        print(ingredient)
-        #        RecipeIngredients.objects.update_or_create(#amount=amount,
-        #            **ingredient[0], )#recipe_id=instance.id)
-        #    #RecipeIngredients.objects.create(**ingredients)#, recipe_id=recipe.id)
-        #    #instance.ingredients.set(validated_data.pop('ingredients_to'))
         print(f'Last validated data: {validated_data}')
         instance.save()
-        #recipe = Recipe.objects.update(**validated_data)
-        #print(f'Recipe: {recipe}')
         return instance
 
 
