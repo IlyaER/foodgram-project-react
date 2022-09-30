@@ -45,23 +45,31 @@ class IngredientSerializer(serializers.ModelSerializer):
 
 
 class RecipeIngredientSerializer(serializers.ModelSerializer):
-    name = serializers.SlugRelatedField(
-        slug_field='ingredient',
-        read_only=True
-    )
-
-    measurement_unit = serializers.CharField(source='ingredient.measurement_unit')
+    id = serializers.ReadOnlyField(source='ingredient.id')
+    name = serializers.ReadOnlyField(source='ingredient.name')
+    measurement_unit = serializers.ReadOnlyField(source='ingredient.measurement_unit')
 
     class Meta:
         model = RecipeIngredient
-        #fields = '__all__'
-        fields = ('id', 'name', 'measurement_unit', 'amount')
+        fields = (
+            'id', 'name', 'measurement_unit', 'amount')
 
 
-    def validate(self, attrs):
-        print(f'RecipeIngred Attrs: {attrs}')
-        #print(f'RecipeIngred Attrs: {self.initial_data}')
-        return attrs
+#    #name = serializers.SlugRelatedField(
+#    #    slug_field='name',
+#    #    read_only=True
+#    #)
+#    #amount = serializers.CharField(source='recipeingredient.amount')
+#    measurement_unit = serializers.CharField()
+#    name = serializers.CharField()
+#
+#    class Meta:
+#        model = RecipeIngredient
+#        #fields = '__all__'
+#        fields = ('id', 'name', 'measurement_unit', 'amount', )
+
+
+
 
 class RecipeIngredientWriteSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField()
@@ -88,7 +96,7 @@ class RecipeIngredientWriteSerializer(serializers.ModelSerializer):
 
 class RecipeWriteSerializer(serializers.ModelSerializer):
     #ingredients = RecipeIngredientWriteSerializer(source='ingredients_to', many=True)
-    ingredients = RecipeIngredientWriteSerializer(many=True)
+    ingredients = RecipeIngredientWriteSerializer(many=True, )
     #tags = TagSerializer(many=True)
     tags = serializers.PrimaryKeyRelatedField(queryset=Tag.objects.all(), many=True)
     image = Base64ImageField()
@@ -108,10 +116,10 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
         print(recipe)
         print(tags)
         for ingredient in ingredients:
-            RecipeIngredients.objects.create(
+            RecipeIngredient.objects.create(
                 **ingredient, recipe_id=recipe.id)
         for tag in tags:
-            RecipesTags.objects.create(tag=tag, recipe_id=recipe.id)
+            RecipeTag.objects.create(tag=tag, recipe_id=recipe.id)
         print(f'Recipe: {recipe}')
         return recipe #validated_data
 
@@ -172,7 +180,7 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
 
 class RecipeSerializer(serializers.ModelSerializer):
     author = UserSerializer(read_only=True)
-    ingredients = RecipeIngredientSerializer(many=True)
+    ingredients = RecipeIngredientSerializer(many=True, source='ingredient')
     #ingredients = IngredientSerializer(many=True)
     tags = TagSerializer(many=True, read_only=True)
     image = Base64ImageField()
