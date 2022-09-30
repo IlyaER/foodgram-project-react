@@ -52,7 +52,6 @@ class CustomUserViewSet(DjoserUserViewSet):
         return Response(status=HTTP_404_NOT_FOUND)
 
 
-
 class TagViewSet(ReadOnlyModelViewSet):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
@@ -65,7 +64,7 @@ class IngredientViewSet(ReadOnlyModelViewSet):
     paginator = None
 
 
-class RecipesViewSet(ModelViewSet):
+class RecipeViewSet(ModelViewSet):
     queryset = Recipe.objects.all()
     serializer_class = RecipeSerializer
     #permission_classes = (IsAuthenticated,)
