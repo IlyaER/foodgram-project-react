@@ -11,6 +11,9 @@ class Tag(models.Model):
     def __str__(self):
         return self.name
 
+    class Meta:
+        verbose_name = 'Метка'
+        verbose_name_plural = 'Метки'
 
 class Ingredient(models.Model):
     """
@@ -18,6 +21,10 @@ class Ingredient(models.Model):
     """
     name = models.CharField(max_length=64)
     measurement_unit = models.CharField(max_length=32)
+
+    class Meta:
+        verbose_name = 'Ингредиент'
+        verbose_name_plural = 'Ингредиенты'
 
 
 class Recipe(models.Model):
@@ -43,6 +50,11 @@ class Recipe(models.Model):
     cooking_time = models.IntegerField()
 
     date_added = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = 'Рецепт'
+        verbose_name_plural = 'Рецепты'
+        ordering = ('date_added',)
 
     #@property
     #def fav_count(self):
