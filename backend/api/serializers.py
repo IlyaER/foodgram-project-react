@@ -95,8 +95,7 @@ class RecipeIngredientWriteSerializer(serializers.ModelSerializer):
 
 
 class RecipeWriteSerializer(serializers.ModelSerializer):
-    #ingredients = RecipeIngredientWriteSerializer(source='ingredients_to', many=True)
-    ingredients = RecipeIngredientWriteSerializer(many=True, )
+    ingredients = RecipeIngredientWriteSerializer(many=True, source='ingredient')
     #tags = TagSerializer(many=True)
     tags = serializers.PrimaryKeyRelatedField(queryset=Tag.objects.all(), many=True)
     image = Base64ImageField()
@@ -109,18 +108,32 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         print(f'Initial data: {self.initial_data}')
         print(f'Validated data: {validated_data}')
-        ingredients = validated_data.pop('ingredients')
+        ingredients = validated_data.pop('ingredient')
         tags = validated_data.pop('tags')
         recipe = Recipe.objects.create(**validated_data)
         print(f'ingredients {ingredients}')
         print(recipe)
         print(tags)
+        #elements = []
+        #for ingredient in ingredients:
+        #    elements.append(
+        #        RecipeIngredient(
+        #            recipe=recipe,
+        #            name_id=ingredient.get("id"),
+        #            amount=ingredient.get("amount"),
+        #        )
+        #    )
+        #RecipeIngredient.objects.bulk_create(elements)
         for ingredient in ingredients:
             RecipeIngredient.objects.create(
-                **ingredient, recipe_id=recipe.id)
+                ingredient_id=ingredient.get("id"),
+                amount=ingredient.get("amount"),
+                recipe=recipe
+            )
         for tag in tags:
             RecipeTag.objects.create(tag=tag, recipe_id=recipe.id)
         print(f'Recipe: {recipe}')
+        print(f'Validated data: {validated_data}')
         return recipe #validated_data
 
 
@@ -145,13 +158,13 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
             elements = []
             for ingredient in ingredients:
                 elements.append(
-                    RecipeIngredients(
+                    RecipeIngredient(
                         recipe=instance,
                         name_id=ingredient.get("id"),
                         amount=ingredient.get("amount"),
                     )
                 )
-            RecipeIngredients.objects.bulk_create(elements)
+            RecipeIngredient.objects.bulk_create(elements)
         #    #TODO some strange things with ingredients
         #    # #instance.ingredients_to.clear()
         #    #RecipeIngredients.objects.filter(recipe=instance).all().delete()
