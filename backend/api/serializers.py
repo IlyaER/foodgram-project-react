@@ -142,6 +142,10 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
             'image', instance.image)
         instance.name = validated_data.get(
             'name', instance.name)
+        instance.text = validated_data.get(
+            'text', instance.text)
+        instance.cooking_time = validated_data.get(
+            'cooking_time', instance.cooking_time)
         print(instance.tags)
         print(validated_data)
         if validated_data.get('tags'):
@@ -152,19 +156,29 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
             #for tag in tags:
             #    RecipesTags.objects.create(tag=tag, recipe_id=instance.id)
         print(instance.tags)
-        if validated_data.get('ingredients'):
-            ingredients = validated_data.pop('ingredients')
-            instance.ingredients.clear()
-            elements = []
-            for ingredient in ingredients:
-                elements.append(
-                    RecipeIngredient(
-                        recipe=instance,
-                        name_id=ingredient.get("id"),
-                        amount=ingredient.get("amount"),
-                    )
-                )
-            RecipeIngredient.objects.bulk_create(elements)
+        ingredients = validated_data.pop('ingredient')
+        print(ingredients)
+        instance.ingredients.clear()
+        for ingredient in ingredients:
+            print(ingredient)
+            RecipeIngredient.objects.create(
+                ingredient_id=ingredient.get("id"),
+                amount=ingredient.get("amount"),
+                recipe=instance
+            )
+
+            #ingredients = validated_data.pop('ingredients')
+            #instance.ingredients.clear()
+            #elements = []
+            #for ingredient in ingredients:
+            #    elements.append(
+            #        RecipeIngredient(
+            #            recipe=instance,
+            #            name_id=ingredient.get("id"),
+            #            amount=ingredient.get("amount"),
+            #        )
+            #    )
+            #RecipeIngredient.objects.bulk_create(elements)
         #    #TODO some strange things with ingredients
         #    # #instance.ingredients_to.clear()
         #    #RecipeIngredients.objects.filter(recipe=instance).all().delete()
