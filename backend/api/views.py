@@ -5,7 +5,7 @@ from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.status import *
 from rest_framework.viewsets import GenericViewSet, ModelViewSet, ReadOnlyModelViewSet
-from recipes.models import User
+
 
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
@@ -82,20 +82,14 @@ class RecipesViewSet(ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
-        #serializer = RecipeWriteSerializer(data=request.data)
-        #print(f'Initial data (viewset create method):{serializer.initial_data}')
-        #ingredients = serializer.initial_data.pop('ingredients')
         serializer.is_valid(raise_exception=True)
-        #print(serializer)
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
         #return Response(serializer.data, status=HTTP_201_CREATED, headers=headers)
 
 
     def perform_create(self, serializer):
-        return serializer.save(author=self.request.user
-            #category=category, genre=genre, description=description
-        )
+        return serializer.save(author=self.request.user)
 
     @action(["post", "delete"], permission_classes=[IsAuthenticated], detail=True)
     def shopping_cart(self, request, pk):
@@ -139,15 +133,3 @@ class RecipesViewSet(ModelViewSet):
         return Response(status=HTTP_404_NOT_FOUND)
 
 
-#class SubscribeViewSet(ModelViewSet):
-#    serializer_class = SubscribeSerializer
-#
-#    #permission_classes = (IsAuthenticated, )
-#    #filter_backends = (filters.SearchFilter, )
-#    search_fields = ('is_subscribed__username',)
-#
-#    def get_queryset(self):
-#        return self.request.user.subscriber.all()
-#
-#    def perform_create(self, serializer):
-#        serializer.save(user=self.request.user)

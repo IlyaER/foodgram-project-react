@@ -25,17 +25,7 @@ class TagSerializer(serializers.ModelSerializer):
 
 
 
-
-
-
 class IngredientSerializer(serializers.ModelSerializer):
-    #amount = serializers.SlugRelatedField(
-    #    source='*',
-    #    slug_field='amount',
-    #    #queryset=Ingredients.objects.all(),
-    #    read_only=True
-    #)
-    #amount = "RecipeIngredientSerializer(source='ingredients_to')"
     #amount = serializers.PrimaryKeyRelatedField(
     #    queryset=RecipeIngredients.objects.all(),
     #    #source='name_id'
@@ -51,25 +41,14 @@ class RecipeIngredientSerializer(serializers.ModelSerializer):
         slug_field='name',
         read_only=True
     )
-    #measurement_unit = IngredientSerializer(source='name')
-    #measurement_unit = serializers.SlugRelatedField(
-    #    source='name',
-    #    slug_field='measurement_unit',
-    #    #queryset=Ingredients.objects.all(),
-    #    read_only=True,
-    #)
+
     measurement_unit = serializers.CharField(source='name.measurement_unit')
 
     class Meta:
         model = RecipeIngredients
         #fields = '__all__'
         fields = ('id', 'name', 'measurement_unit', 'amount')
-        #read_only_fields = ('id', 'measurement_unit',)
 
-        #extra_kwargs = {
-        #            'name': {'source': 'id', 'write_only': True},
-        #            #'id': {'write_only': True}
-        #        }
 
     def validate(self, attrs):
         print(f'RecipeIngred Attrs: {attrs}')
@@ -88,13 +67,9 @@ class RecipeIngredientWriteSerializer(serializers.ModelSerializer):
     class Meta:
         model = RecipeIngredients
         fields = ('amount', 'id',)
-        #extra_kwargs = {
-        #    'name': {'source': 'id',}# 'write_only': True},
-        #    #'id': {'write_only': True},
-        #}
+
 
 class RecipeWriteSerializer(serializers.ModelSerializer):
-    #author = UserSerializer(read_only=True)
     ingredients = RecipeIngredientWriteSerializer(source='ingredients_to', many=True)
     #ingredients = IngredientSerializer(many=True)
     #tags = TagSerializer(many=True)
@@ -105,10 +80,7 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
         model = Recipe
         fields = ('id', 'tags', 'ingredients', 'name', 'image', 'text', 'cooking_time',)#'__all__', )
 
-    #def validate(self, attrs):
-    #    print(f'Attrs: {attrs}')
-    #    print(self.initial_data)
-    #    return attrs
+
 
     def create(self, validated_data):
         print(f'Initial data: {self.initial_data}')
@@ -129,20 +101,6 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
 
 
     def update(self, instance, validated_data):
-        #info = model_meta.get_field_info(instance)
-        #m2m_fields = []
-        #for attr, value in validated_data.items():
-        #    if attr in info.relations and info.relations[attr].to_many:
-        #        m2m_fields.append((attr, value))
-        #    else:
-        #        setattr(instance, attr, value)
-#
-        #instance.save()
-        #for attr, value in m2m_fields:
-        #    field = getattr(instance, attr)
-        #    field.set(value)
-#
-        #return instance
         instance.image = validated_data.get(
             'image', instance.image)
         instance.name = validated_data.get(
@@ -185,15 +143,6 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
 
 
 class RecipeSerializer(serializers.ModelSerializer):
-    #def __init__(self, *args, **kwargs):
-    #    super().__init__(*args, **kwargs)
-    #    if 'request' in self.context and self.context['request'].method == 'GET':
-    #        self.fields['is_favorited'] = serializers.SerializerMethodField(read_only=True)
-    #        self.fields['is_in_shopping_cart'] = serializers.SerializerMethodField(read_only=True)
-
-    #author = serializers.SlugRelatedField(
-    #    slug_field='username', read_only=True
-    #)
     author = UserSerializer(read_only=True)
     ingredients = RecipeIngredientSerializer(source='ingredients_to', many=True)
     #ingredients = IngredientSerializer(many=True)
@@ -231,25 +180,10 @@ class RecipeSerializer(serializers.ModelSerializer):
         return user.shopping_cart.filter(cart_recipe_id=obj.id).exists()
 
 
-    def validate(self, attrs):
-        print(f'Attrs: {attrs}')
-        print(self.initial_data)
-        return attrs
-
-
-    def create(self, validated_data):
-        print(f'Initial data: {self.initial_data}')
-        print(f'Validated data: {validated_data}')
-        return validated_data
-
-
 class ShortRecipeSerializer(RecipeSerializer):
     class Meta:
         model = Recipe
         fields = ('id', 'name', 'image', 'cooking_time')
-
-
-
 
 
 class SubscriptionSerializer(UserSerializer):
@@ -269,9 +203,6 @@ class SubscribeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Subscribe
         fields = '__all__'
-
-    #def create(self, validated_data):
-    #    return Subscribe.objects.create(**validated_data)
 
     def validate(self, data):
         user = self.context['request'].user
