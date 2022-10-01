@@ -1,3 +1,4 @@
+from django.db.models import Sum
 from django.shortcuts import render
 from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet as DjoserUserViewSet
@@ -93,9 +94,24 @@ class RecipeViewSet(ModelViewSet):
     #    headers = self.get_success_headers(serializer.data)
     #    #return Response(serializer.data, status=HTTP_201_CREATED, headers=headers)
 
-
     def perform_create(self, serializer):
         return serializer.save(author=self.request.user)
+
+    @action(["get",], permission_classes=[IsAuthenticated], detail=False)
+    def download_shopping_cart(self, request):
+
+        ingredients = Ingredient.objects.filter(
+            recipes__shopping_cart__user=request.user
+        ).values(
+            'name',
+            'measurement_unit'
+        ).annotate(amount=Sum('recipe__amount')).order_by()
+        print(ingredients)
+        print("Список покупок.")
+        for i, ingredient in enumerate(ingredients, 1):
+            print(f"{i} {ingredient['name']} ({ingredient['measurement_unit']}): {ingredient['amount']}")
+        return ingredients
+
 
     @action(["post", "delete"], permission_classes=[IsAuthenticated], detail=True)
     def shopping_cart(self, request, pk):
