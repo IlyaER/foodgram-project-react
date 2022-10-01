@@ -29,12 +29,3 @@ Nginx
 ```
 docker-compose up -d
 ```
-
-
-
-
-
-
-
-
-
