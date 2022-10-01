@@ -30,14 +30,13 @@ class CustomUserViewSet(DjoserUserViewSet):
     #queryset = User.objects.all()
     max_page_size = 3
 
-    @action(["get"], permission_classes=[IsAuthenticated], pagination_class=PageLimitPagination, detail=False)
+    @action(["get"], permission_classes=[IsAuthenticated], detail=False)
     def subscriptions(self, request):
         user = self.request.user
-        queryset = User.objects.filter(subscribed__user=request.user)
-        #queryset = user.subscriptions.all()
-        limit = request.query_params.get('recipes_limit')
-        if limit:
-            queryset = queryset[:int(limit)]
+        queryset = user.subscriptions.all()
+        #limit = request.query_params.get('recipes_limit')
+        #if limit:
+        #    queryset = queryset[:int(limit)]
         page = self.paginate_queryset(queryset)
         serializer = SubscriptionSerializer(page, many=True, context={'request': request})
         return self.get_paginated_response(serializer.data)

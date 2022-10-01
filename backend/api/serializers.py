@@ -175,9 +175,6 @@ class ShortRecipeSerializer(RecipeSerializer):
         fields = ('id', 'name', 'image', 'cooking_time')
 
 
-
-
-
 class SubscriptionSerializer(UserSerializer):
     #recipes = ShortRecipeSerializer(source='recipe', many=True, read_only=True)
     recipes_count = serializers.SerializerMethodField()
