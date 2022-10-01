@@ -10,7 +10,7 @@ from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfgen import canvas
 from rest_framework.decorators import action, permission_classes
 from rest_framework.generics import get_object_or_404
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework.status import *
 from rest_framework.viewsets import GenericViewSet, ModelViewSet, ReadOnlyModelViewSet
 
@@ -19,24 +19,29 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 
 from recipes.filters import *
+from .paginators import PageLimitPagination
+from .permissions import IsAdminOrReadOnly, IsAuthorOrAdminOrReadOnly
 from .serializers import *
 from recipes.models import *
 
 
 class CustomUserViewSet(DjoserUserViewSet):
-    pagination_class = PageNumberPagination
+    pagination_class = PageLimitPagination
     #queryset = User.objects.all()
+    max_page_size = 3
 
-
-    @action(["get"], detail=False)
+    @action(["get"], permission_classes=[IsAuthenticated], pagination_class=PageLimitPagination, detail=False)
     def subscriptions(self, request):
         user = self.request.user
-        queryset = user.subscriptions.all()
+        queryset = User.objects.filter(subscribed__user=request.user)
+        #queryset = user.subscriptions.all()
+        limit = request.query_params.get('recipes_limit')
+        if limit:
+            queryset = queryset[:int(limit)]
         page = self.paginate_queryset(queryset)
         serializer = SubscriptionSerializer(page, many=True, context={'request': request})
         return self.get_paginated_response(serializer.data)
-        #return Response(serializer.data)
-        #return self.request.user.subscriber.all()
+
 
     @action(["post", "delete"], permission_classes=[IsAuthenticated], detail=True)
     def subscribe(self, request, id):
@@ -66,12 +71,14 @@ class CustomUserViewSet(DjoserUserViewSet):
 class TagViewSet(ReadOnlyModelViewSet):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
+    permission_classes = (IsAdminOrReadOnly,)
     paginator = None
 
 
 class IngredientViewSet(ReadOnlyModelViewSet):
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
+    permission_classes = (IsAdminOrReadOnly,)
     paginator = None
     filterset_class = IngredientFilter
 
@@ -79,7 +86,8 @@ class IngredientViewSet(ReadOnlyModelViewSet):
 class RecipeViewSet(ModelViewSet):
     queryset = Recipe.objects.all()
     serializer_class = RecipeSerializer
-    #permission_classes = (IsAuthenticated,)
+    permission_classes = [IsAuthorOrAdminOrReadOnly, ]
+    pagination_class = PageLimitPagination
     filterset_class = RecipeFilter
     #filter_backends = (DjangoFilterBackend,)
 
