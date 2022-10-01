@@ -60,6 +60,21 @@ if DEBUG:
     #    'JQUERY_URL': '//cdn.bootcss.com/jquery/2.1.4/jquery.min.js',
     #}
 
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'WARNING',
+    },
+}
+
+
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_URLS_REGEX = r'^/api/.*$'
 #CORS_ALLOWED_ORIGINS = [
@@ -137,6 +152,11 @@ DJOSER = {
                        'user': 'users.serializers.UserSerializer',
                        'current_user': 'users.serializers.UserSerializer',
                    },
+    'HIDE_USERS': False,
+    'PERMISSIONS': {
+        'user_list': ['rest_framework.permissions.AllowAny'],
+        'user': ['rest_framework.permissions.AllowAny'],
+    }
 }
 
 REST_FRAMEWORK = {

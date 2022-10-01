@@ -15,6 +15,7 @@ class Tag(models.Model):
         verbose_name = 'Метка'
         verbose_name_plural = 'Метки'
 
+
 class Ingredient(models.Model):
     """
     Список всех возможных составных частей для блюд
@@ -54,7 +55,7 @@ class Recipe(models.Model):
     class Meta:
         verbose_name = 'Рецепт'
         verbose_name_plural = 'Рецепты'
-        ordering = ('date_added',)
+        ordering = ('-date_added',)
 
     #@property
     #def fav_count(self):
@@ -107,6 +108,7 @@ class Cart(models.Model):
                 name='unique purchase'
             )
         ]
+
 
 class Subscribe(models.Model):
     user = models.ForeignKey(

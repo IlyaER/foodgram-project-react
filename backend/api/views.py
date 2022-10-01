@@ -18,6 +18,8 @@ from recipes.models import *
 
 class CustomUserViewSet(DjoserUserViewSet):
     pagination_class = PageNumberPagination
+    #queryset = User.objects.all()
+
 
     @action(["get"], detail=False)
     def subscriptions(self, request):
@@ -76,11 +78,11 @@ class RecipeViewSet(ModelViewSet):
 
     # TODO Tags create: currently set read_only in serializers
     def get_serializer_class(self):
-        print(self.action)
+        #print(self.action)
         #if self.action == 'list': # retrieve
         #    return self.serializer_class
         if self.action == 'partial_update' or self.action == 'create':
-            print('RecipeWriteSerializer')
+            #print('RecipeWriteSerializer')
             return RecipeWriteSerializer
         return self.serializer_class
 

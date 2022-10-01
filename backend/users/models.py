@@ -6,7 +6,6 @@ from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
 
 
-
 class CustomUserManager(UserManager):
 
     def get_by_natural_key(self, username):
