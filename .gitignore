@@ -157,3 +157,7 @@ yarn-debug.log*
 yarn-error.log*
 /frontend/node_modules/
 /tests/
+venv.cmd
+unvenv.cmd
+requirementsOLD.txt
+/backend/media
