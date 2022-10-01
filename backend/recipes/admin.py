@@ -22,7 +22,8 @@ class IngredientAdmin(admin.ModelAdmin):
     list_display = ('name', 'measurement_unit')
     search_fields = ('name', )
 
+
 admin.site.register(Tag)
-#admin.site.register(Ingredient)
-#admin.site.register(Recipe)
+admin.site.register(RecipeIngredient)
+admin.site.register(RecipeTag)
 

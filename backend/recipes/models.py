@@ -27,6 +27,9 @@ class Ingredient(models.Model):
         verbose_name = 'Ингредиент'
         verbose_name_plural = 'Ингредиенты'
 
+    def __str__(self):
+        return f'{self.name}'
+
 
 class Recipe(models.Model):
     author = models.ForeignKey(
@@ -57,6 +60,8 @@ class Recipe(models.Model):
         verbose_name_plural = 'Рецепты'
         ordering = ('-date_added',)
 
+    def __str__(self):
+        return f'{self.name}'
     #@property
     #def fav_count(self):
     #    return self.favorite.aggregate(models.Count('id'))['id__count'] #obj.favorite.count()
@@ -66,8 +71,12 @@ class RecipeTag(models.Model):
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
     tag = models.ForeignKey(Tag, on_delete=models.CASCADE)
 
+    class Meta:
+        verbose_name = 'Метка рецепта'
+        verbose_name_plural = 'Метки рецептов'
+
     def __str__(self):
-        return f'{self.tag} {self.recipe}'
+        return f'{self.tag} {self.recipe.name}'
 
 
 class RecipeIngredient(models.Model):
@@ -82,6 +91,12 @@ class RecipeIngredient(models.Model):
                 name='unique ingredients'
             )
         ]
+
+        verbose_name = 'Ингредиент в рецепте'
+        verbose_name_plural = 'Ингредиенты в рецептах'
+
+    def __str__(self):
+        return f'{self.recipe.name} {self.ingredient}'
 
 
 class Favorite(models.Model):
