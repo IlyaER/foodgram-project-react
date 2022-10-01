@@ -189,7 +189,12 @@ class SubscriptionSerializer(UserSerializer):
         read_only_fields = 'id', 'is_subscribed',
 
     def get_recipes(self, obj):
-        recipes = Recipe.objects.filter(author=obj)[:3]
+        #print(self.context['request'].query_params.get('recipes_limit'))
+        #limit = self.context['request'].query_params.get('recipes_limit')
+        recipes = Recipe.objects.filter(author=obj)#[:int(limit)]
+        limit = self.context['request'].query_params.get('recipes_limit')
+        if limit:
+            recipes = recipes[:int(limit)]
         return ShortRecipeSerializer(recipes, many=True).data
 
 
