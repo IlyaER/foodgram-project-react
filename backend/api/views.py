@@ -1,7 +1,13 @@
+import io
+
 from django.db.models import Sum
+from django.http import HttpResponse, FileResponse
 from django.shortcuts import render
 from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet as DjoserUserViewSet
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
+from reportlab.pdfgen import canvas
 from rest_framework.decorators import action, permission_classes
 from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
@@ -107,10 +113,26 @@ class RecipeViewSet(ModelViewSet):
             'measurement_unit'
         ).annotate(amount=Sum('recipe__amount')).order_by()
         print(ingredients)
-        print("Список покупок.")
+
+        buffer = io.BytesIO()
+        pdf = canvas.Canvas(buffer, bottomup=1)
+        #pdf.setFont('Courier', 14)
+        pdfmetrics.registerFont(TTFont('DejaVuSans', 'DejaVuSans.ttf'))
+        pdf.setFont('DejaVuSans', 14)
+        #print(pdf.getAvailableFonts())
+        pdf.drawString(70, 770, "Список покупок.")
         for i, ingredient in enumerate(ingredients, 1):
-            print(f"{i} {ingredient['name']} ({ingredient['measurement_unit']}): {ingredient['amount']}")
-        return ingredients
+            pdf.drawString(70, 770 - i*20, f"{i} {ingredient['name']} ({ingredient['measurement_unit']}): {ingredient['amount']}")
+        pdf.showPage()
+        pdf.save()
+        buffer.seek(0)
+        content = "Список покупок."
+        #print("Список покупок.")
+        #for i, ingredient in enumerate(ingredients, 1):
+        #    print(f"{i} {ingredient['name']} ({ingredient['measurement_unit']}): {ingredient['amount']}")
+        #response = HttpResponse(content, content_type='text/plain')
+        #response['Content-Disposition'] = 'attachment; filename="Purchase.txt"'
+        return FileResponse(buffer, as_attachment=False, filename='purchase.pdf')
 
 
     @action(["post", "delete"], permission_classes=[IsAuthenticated], detail=True)
