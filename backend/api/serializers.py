@@ -1,10 +1,12 @@
+import base64
+
 from django.core.files.base import ContentFile
 from rest_framework import serializers
-from rest_framework.utils import model_meta
 
-from recipes.models import *
+from recipes.models import (Cart, Favorite, Ingredient, Recipe,
+                            RecipeIngredient, RecipeTag, Subscribe, Tag)
+from users.models import User
 from users.serializers import UserSerializer
-import base64
 
 
 class Base64ImageField(serializers.ImageField):
@@ -34,11 +36,8 @@ class IngredientWriteSerializer(serializers.ModelSerializer):
 
 
 class IngredientSerializer(serializers.ModelSerializer):
-    #amount = serializers.PrimaryKeyRelatedField(
-    #    queryset=RecipeIngredients.objects.all(),
-    #    #source='name_id'
-    #)
     amount = serializers.CharField(read_only=True, source='name.amount')
+
     class Meta:
         model = Ingredient
         fields = '__all__'
@@ -47,7 +46,9 @@ class IngredientSerializer(serializers.ModelSerializer):
 class RecipeIngredientSerializer(serializers.ModelSerializer):
     id = serializers.ReadOnlyField(source='ingredient.id')
     name = serializers.ReadOnlyField(source='ingredient.name')
-    measurement_unit = serializers.ReadOnlyField(source='ingredient.measurement_unit')
+    measurement_unit = serializers.ReadOnlyField(
+        source='ingredient.measurement_unit'
+    )
 
     class Meta:
         model = RecipeIngredient
@@ -65,26 +66,32 @@ class RecipeIngredientWriteSerializer(serializers.ModelSerializer):
 
 
 class RecipeWriteSerializer(serializers.ModelSerializer):
-    ingredients = RecipeIngredientWriteSerializer(many=True, source='ingredient')
-    #tags = TagSerializer(many=True)
-    tags = serializers.PrimaryKeyRelatedField(queryset=Tag.objects.all(), many=True)
+    ingredients = RecipeIngredientWriteSerializer(
+        many=True,
+        source='ingredient'
+    )
+    tags = serializers.PrimaryKeyRelatedField(
+        queryset=Tag.objects.all(),
+        many=True
+    )
     image = Base64ImageField()
 
     class Meta:
         model = Recipe
-        fields = ('id', 'tags', 'ingredients', 'name', 'image', 'text', 'cooking_time',)#'__all__', )
-
+        fields = (
+            'id',
+            'tags',
+            'ingredients',
+            'name',
+            'image',
+            'text',
+            'cooking_time',
+        )
 
     def create(self, validated_data):
-        print(f'Initial data: {self.initial_data}')
-        print(f'Validated data: {validated_data}')
         ingredients = validated_data.pop('ingredient')
         tags = validated_data.pop('tags')
         recipe = Recipe.objects.create(**validated_data)
-        print(f'ingredients {ingredients}')
-        print(recipe)
-        print(tags)
-
         for ingredient in ingredients:
             RecipeIngredient.objects.create(
                 ingredient_id=ingredient.get("id"),
@@ -93,10 +100,7 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
             )
         for tag in tags:
             RecipeTag.objects.create(tag=tag, recipe_id=recipe.id)
-        print(f'Recipe: {recipe}')
-        print(f'Validated data: {validated_data}')
-        return recipe #validated_data
-
+        return recipe
 
     def update(self, instance, validated_data):
         instance.image = validated_data.get(
@@ -107,26 +111,19 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
             'text', instance.text)
         instance.cooking_time = validated_data.get(
             'cooking_time', instance.cooking_time)
-        print(instance.tags)
-        print(validated_data)
         if validated_data.get('tags'):
             instance.tags.clear()
             tags = validated_data.pop('tags')
             for tag in tags:
                 RecipeTag.objects.create(tag=tag, recipe_id=instance.id)
-        print(instance.tags)
         ingredients = validated_data.pop('ingredient')
-        print(ingredients)
         instance.ingredients.clear()
         for ingredient in ingredients:
-            print(ingredient)
             RecipeIngredient.objects.create(
                 ingredient_id=ingredient.get("id"),
                 amount=ingredient.get("amount"),
                 recipe=instance
             )
-
-        print(f'Last validated data: {validated_data}')
         instance.save()
         return instance
 
@@ -134,7 +131,6 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
 class RecipeSerializer(serializers.ModelSerializer):
     author = UserSerializer(read_only=True)
     ingredients = RecipeIngredientSerializer(many=True, source='ingredient')
-    #ingredients = IngredientSerializer(many=True)
     tags = TagSerializer(many=True, read_only=True)
     image = Base64ImageField()
     is_favorited = serializers.SerializerMethodField(read_only=True)
@@ -142,26 +138,32 @@ class RecipeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Recipe
-        #fields = '__all__'
-        fields = ('id', 'tags', 'author', 'ingredients', 'name', 'image', 'text', 'cooking_time', 'is_favorited', 'is_in_shopping_cart')
+        fields = (
+            'id',
+            'tags',
+            'author',
+            'ingredients',
+            'name',
+            'image',
+            'text',
+            'cooking_time',
+            'is_favorited',
+            'is_in_shopping_cart'
+        )
         read_only_fields = ('id', 'is_favorited', 'is_in_shopping_cart')
-        #extra_kwargs = {
-        #    'ingredients': {'source': 'recipes', 'write_only': True},
-        #}
 
     def get_is_favorited(self, obj):
-    #    pass
-        if 'request' in self.context and self.context['request'].method != 'GET':
+        method = self.context['request'].method
+        if 'request' in self.context and method != 'GET':
             return False
         user = self.context.get('request').user
         if user.is_anonymous:
             return False
         return user.favorite.filter(favorite_recipe_id=obj.id).exists()
 
-
     def get_is_in_shopping_cart(self, obj):
-    #    pass
-        if 'request' in self.context and self.context['request'].method != 'GET':
+        method = self.context['request'].method
+        if 'request' in self.context and method != 'GET':
             return False
         user = self.context.get('request').user
         if user.is_anonymous:
@@ -176,27 +178,33 @@ class ShortRecipeSerializer(RecipeSerializer):
 
 
 class SubscriptionSerializer(UserSerializer):
-    #recipes = ShortRecipeSerializer(source='recipe', many=True, read_only=True)
     recipes_count = serializers.SerializerMethodField()
     recipes = serializers.SerializerMethodField()
 
     class Meta:
         model = User
-        fields = 'email', 'id', 'username', 'first_name', 'last_name', 'is_subscribed', 'recipes', 'recipes_count'
+        fields = (
+            'email',
+            'id',
+            'username',
+            'first_name',
+            'last_name',
+            'is_subscribed',
+            'recipes',
+            'recipes_count'
+        )
         read_only_fields = 'id', 'is_subscribed',
 
     def get_recipes(self, obj):
-        #print(self.context['request'].query_params.get('recipes_limit'))
-        #limit = self.context['request'].query_params.get('recipes_limit')
-        recipes = Recipe.objects.filter(author=obj)#[:int(limit)]
+        recipes = Recipe.objects.filter(author=obj)
         limit = self.context['request'].query_params.get('recipes_limit')
         if limit:
             recipes = recipes[:int(limit)]
         return ShortRecipeSerializer(recipes, many=True).data
 
-
     def get_recipes_count(self, obj):
         return obj.recipe.count()
+
 
 class SubscribeSerializer(serializers.ModelSerializer):
     class Meta:
@@ -225,7 +233,6 @@ class FavoriteSerializer(serializers.ModelSerializer):
         model = Favorite
         fields = '__all__'
 
-
     def validate(self, data):
         user = self.context['request'].user
         favorite_recipe = data['favorite_recipe']
@@ -243,7 +250,6 @@ class CartSerializer(serializers.ModelSerializer):
     class Meta:
         model = Cart
         fields = '__all__'
-
 
     def validate(self, data):
         user = self.context['request'].user

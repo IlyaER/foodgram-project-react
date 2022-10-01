@@ -1,5 +1,5 @@
-from django.contrib.auth.models import AbstractUser
 from django.db import models
+
 from users.models import User
 
 
@@ -62,9 +62,6 @@ class Recipe(models.Model):
 
     def __str__(self):
         return f'{self.name}'
-    #@property
-    #def fav_count(self):
-    #    return self.favorite.aggregate(models.Count('id'))['id__count'] #obj.favorite.count()
 
 
 class RecipeTag(models.Model):
@@ -80,8 +77,16 @@ class RecipeTag(models.Model):
 
 
 class RecipeIngredient(models.Model):
-    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE, related_name='ingredient')
-    ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE, related_name='recipe')
+    recipe = models.ForeignKey(
+        Recipe,
+        on_delete=models.CASCADE,
+        related_name='ingredient'
+    )
+    ingredient = models.ForeignKey(
+        Ingredient,
+        on_delete=models.CASCADE,
+        related_name='recipe'
+    )
     amount = models.IntegerField(blank=False,)
 
     class Meta:
@@ -100,8 +105,16 @@ class RecipeIngredient(models.Model):
 
 
 class Favorite(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='favorite')
-    favorite_recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE, related_name='favorite')
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='favorite'
+    )
+    favorite_recipe = models.ForeignKey(
+        Recipe,
+        on_delete=models.CASCADE,
+        related_name='favorite'
+    )
 
     class Meta:
         constraints = [
@@ -113,8 +126,14 @@ class Favorite(models.Model):
 
 
 class Cart(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='shopping_cart')
-    cart_recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE, related_name='shopping_cart')
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='shopping_cart')
+    cart_recipe = models.ForeignKey(
+        Recipe,
+        on_delete=models.CASCADE,
+        related_name='shopping_cart')
 
     class Meta:
         constraints = [
@@ -146,4 +165,3 @@ class Subscribe(models.Model):
                 name='unique subscribers'
             )
         ]
-

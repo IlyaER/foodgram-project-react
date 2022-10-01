@@ -1,14 +1,9 @@
-import debug_toolbar
-from django.conf.urls import url
+
 from django.urls import include, path
 from rest_framework import routers
-from rest_framework.authtoken import views
 
-
-from foodgram import settings
-from .views import *
-
-
+from .views import (CustomUserViewSet, IngredientViewSet, RecipeViewSet,
+                    TagViewSet)
 
 app_name = 'api'
 
@@ -19,12 +14,7 @@ router.register('ingredients', IngredientViewSet)
 router.register('recipes', RecipeViewSet)
 
 urlpatterns = [
-    #path('', include(router.urls)),
-    #path('', include('djoser.urls')),
-    #path('auth/', include('djoser.urls.authtoken')),
-
     path('auth/', include('users.urls')),
 ]
 
 urlpatterns += router.urls
-

@@ -1,23 +1,18 @@
 
 import os
 
-# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
+SECRET_KEY = os.getenv(
+    'SECRET_KEY',
+    default='io6!k!*#qi)9=0mcm0n&#_r4mum%(w6cy3fo*4$l3_3c5(!54u'
+)
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv('SECRET_KEY', default='io6!k!*#qi)9=0mcm0n&#_r4mum%(w6cy3fo*4$l3_3c5(!54u')
-
-# SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
 ALLOWED_HOSTS = []
 
-
-# Application definition
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -56,9 +51,6 @@ if DEBUG:
     DEBUG_TOOLBAR_CONFIG = {
         'INTERCEPT_REDIRECTS': False,
     }
-    #CONFIG_DEFAULTS = {
-    #    'JQUERY_URL': '//cdn.bootcss.com/jquery/2.1.4/jquery.min.js',
-    #}
 
 LOGGING = {
     'version': 1,
@@ -77,9 +69,9 @@ LOGGING = {
 
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_URLS_REGEX = r'^/api/.*$'
-#CORS_ALLOWED_ORIGINS = [
-#    'http://localhost:3000',
-#]
+# CORS_ALLOWED_ORIGINS = [
+#     'http://localhost:3000',
+# ]
 
 ROOT_URLCONF = 'foodgram.urls'
 
@@ -108,7 +100,6 @@ DATABASES = {
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
-
 
 
 AUTH_PASSWORD_VALIDATORS = [
@@ -147,7 +138,6 @@ AUTH_USER_MODEL = 'users.User'
 
 
 DJOSER = {
-    #'LOGIN_FIELD': 'email',
     'SERIALIZERS': {
                        'user': 'users.serializers.UserSerializer',
                        'current_user': 'users.serializers.UserSerializer',
@@ -172,6 +162,3 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.TokenAuthentication',
     ]
 }
-
-
-
