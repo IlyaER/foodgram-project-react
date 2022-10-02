@@ -20,4 +20,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     def get_is_subscribed(self, obj):
         user = self.context.get('request').user
-        return not user.is_anonymous and user.subscriptions.filter(id=obj.id).exists()
+        return (
+            not user.is_anonymous
+            and user.subscriptions.filter(id=obj.id).exists()
+        )

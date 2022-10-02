@@ -136,10 +136,12 @@ class RecipeViewSet(ModelViewSet):
     def create_delete_extra(self, request, pk, model, model_field, serializer):
         user = self.request.user
         if request.method == 'DELETE':
-            extra_recipe = get_object_or_404(model, user=user, **{model_field: pk})
-            #extra_recipe = Favorite.objects.filter(user__recipe=recipe, user=user)
-            print(extra_recipe)
-            #extra_recipe.delete()
+            extra_recipe = get_object_or_404(
+                model,
+                user=user,
+                **{model_field: pk}
+            )
+            extra_recipe.delete()
             return Response(status=HTTP_204_NO_CONTENT)
         serializer = serializer(
             context={'request': self.request},
@@ -159,21 +161,13 @@ class RecipeViewSet(ModelViewSet):
         model = Cart
         model_field = 'cart_recipe'
         serializer = CartSerializer
-        return self.create_delete_extra(request, pk, model, model_field, serializer)
-
-        #user = self.request.user
-        #if request.method == 'DELETE':
-        #    cart_recipe = get_object_or_404(Cart, user=user, cart_recipe=pk)
-        #    cart_recipe.delete()
-        #    return Response(status=HTTP_204_NO_CONTENT)
-        #serializer = CartSerializer(
-        #    context={'request': self.request},
-        #    data={'user': user.id, 'cart_recipe': pk}
-        #)
-        #if serializer.is_valid(raise_exception=True):
-        #    serializer.save()
-        #    return Response(serializer.data, status=HTTP_201_CREATED)
-        #return Response(status=HTTP_404_NOT_FOUND)
+        return self.create_delete_extra(
+            request,
+            pk,
+            model,
+            model_field,
+            serializer
+        )
 
     @action(
         ["post", "delete"],
@@ -184,22 +178,10 @@ class RecipeViewSet(ModelViewSet):
         model = Favorite
         model_field = 'favorite_recipe'
         serializer = FavoriteSerializer
-        return self.create_delete_extra(request, pk, model, model_field, serializer)
-
-        #user = self.request.user
-        #if request.method == 'DELETE':
-        #    favorite_recipe = get_object_or_404(
-        #        Favorite,
-        #        user=user,
-        #        favorite_recipe=pk
-        #    )
-        #    favorite_recipe.delete()
-        #    return Response(status=HTTP_204_NO_CONTENT)
-        #serializer = FavoriteSerializer(
-        #    context={'request': self.request},
-        #    data={'user': user.id, 'favorite_recipe': pk}
-        #)
-        #if serializer.is_valid(raise_exception=True):
-        #    serializer.save()
-        #    return Response(serializer.data, status=HTTP_201_CREATED)
-        #return Response(status=HTTP_404_NOT_FOUND)
+        return self.create_delete_extra(
+            request,
+            pk,
+            model,
+            model_field,
+            serializer
+        )
