@@ -35,13 +35,12 @@ class User(AbstractUser):
         choices=USERROLES,
         default=USER
     )
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ('username', 'first_name', 'last_name')
 
     @property
     def is_admin(self):
         return self.access == self.ADMIN
-
-    USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['username', 'first_name', 'last_name']
 
     class Meta:
         ordering = ('pk',)

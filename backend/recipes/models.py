@@ -8,12 +8,12 @@ class Tag(models.Model):
     color = models.CharField(max_length=7, unique=True)
     slug = models.SlugField(unique=True)
 
-    def __str__(self):
-        return self.name
-
     class Meta:
         verbose_name = 'Метка'
         verbose_name_plural = 'Метки'
+
+    def __str__(self):
+        return self.name
 
 
 class Ingredient(models.Model):

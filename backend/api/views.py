@@ -110,8 +110,6 @@ class RecipeViewSet(ModelViewSet):
             'name',
             'measurement_unit'
         ).annotate(amount=Sum('recipe__amount')).order_by()
-        print(ingredients)
-
         buffer = io.BytesIO()
         pdf = canvas.Canvas(buffer)
         pdfmetrics.registerFont(TTFont('DejaVuSans', 'DejaVuSans.ttf'))
@@ -135,20 +133,17 @@ class RecipeViewSet(ModelViewSet):
             filename='purchase.pdf'
         )
 
-    @action(
-        ["post", "delete"],
-        permission_classes=[IsAuthenticated],
-        detail=True
-    )
-    def shopping_cart(self, request, pk):
+    def create_delete_extra(self, request, pk, model, model_field, serializer):
         user = self.request.user
         if request.method == 'DELETE':
-            cart_recipe = get_object_or_404(Cart, user=user, cart_recipe=pk)
-            cart_recipe.delete()
+            extra_recipe = get_object_or_404(model, user=user, **{model_field: pk})
+            #extra_recipe = Favorite.objects.filter(user__recipe=recipe, user=user)
+            print(extra_recipe)
+            #extra_recipe.delete()
             return Response(status=HTTP_204_NO_CONTENT)
-        serializer = CartSerializer(
+        serializer = serializer(
             context={'request': self.request},
-            data={'user': user.id, 'cart_recipe': pk}
+            data={'user': user.id, model_field: pk}
         )
         if serializer.is_valid(raise_exception=True):
             serializer.save()
@@ -160,21 +155,51 @@ class RecipeViewSet(ModelViewSet):
         permission_classes=[IsAuthenticated],
         detail=True
     )
+    def shopping_cart(self, request, pk):
+        model = Cart
+        model_field = 'cart_recipe'
+        serializer = CartSerializer
+        return self.create_delete_extra(request, pk, model, model_field, serializer)
+
+        #user = self.request.user
+        #if request.method == 'DELETE':
+        #    cart_recipe = get_object_or_404(Cart, user=user, cart_recipe=pk)
+        #    cart_recipe.delete()
+        #    return Response(status=HTTP_204_NO_CONTENT)
+        #serializer = CartSerializer(
+        #    context={'request': self.request},
+        #    data={'user': user.id, 'cart_recipe': pk}
+        #)
+        #if serializer.is_valid(raise_exception=True):
+        #    serializer.save()
+        #    return Response(serializer.data, status=HTTP_201_CREATED)
+        #return Response(status=HTTP_404_NOT_FOUND)
+
+    @action(
+        ["post", "delete"],
+        permission_classes=[IsAuthenticated],
+        detail=True
+    )
     def favorite(self, request, pk):
-        user = self.request.user
-        if request.method == 'DELETE':
-            favorite_recipe = get_object_or_404(
-                Favorite,
-                user=user,
-                favorite_recipe=pk
-            )
-            favorite_recipe.delete()
-            return Response(status=HTTP_204_NO_CONTENT)
-        serializer = FavoriteSerializer(
-            context={'request': self.request},
-            data={'user': user.id, 'favorite_recipe': pk}
-        )
-        if serializer.is_valid(raise_exception=True):
-            serializer.save()
-            return Response(serializer.data, status=HTTP_201_CREATED)
-        return Response(status=HTTP_404_NOT_FOUND)
+        model = Favorite
+        model_field = 'favorite_recipe'
+        serializer = FavoriteSerializer
+        return self.create_delete_extra(request, pk, model, model_field, serializer)
+
+        #user = self.request.user
+        #if request.method == 'DELETE':
+        #    favorite_recipe = get_object_or_404(
+        #        Favorite,
+        #        user=user,
+        #        favorite_recipe=pk
+        #    )
+        #    favorite_recipe.delete()
+        #    return Response(status=HTTP_204_NO_CONTENT)
+        #serializer = FavoriteSerializer(
+        #    context={'request': self.request},
+        #    data={'user': user.id, 'favorite_recipe': pk}
+        #)
+        #if serializer.is_valid(raise_exception=True):
+        #    serializer.save()
+        #    return Response(serializer.data, status=HTTP_201_CREATED)
+        #return Response(status=HTTP_404_NOT_FOUND)
