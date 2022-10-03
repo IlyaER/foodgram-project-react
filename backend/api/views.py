@@ -133,7 +133,7 @@ class RecipeViewSet(ModelViewSet):
             filename='purchase.pdf'
         )
 
-    def create_delete_extra(self, request, pk, model, model_field, serializer):
+    def _create_delete_extra(self, request, pk, model, model_field, serializer):
         user = self.request.user
         if request.method == 'DELETE':
             extra_recipe = get_object_or_404(
@@ -161,7 +161,7 @@ class RecipeViewSet(ModelViewSet):
         model = Cart
         model_field = 'cart_recipe'
         serializer = CartSerializer
-        return self.create_delete_extra(
+        return self._create_delete_extra(
             request,
             pk,
             model,
@@ -178,7 +178,7 @@ class RecipeViewSet(ModelViewSet):
         model = Favorite
         model_field = 'favorite_recipe'
         serializer = FavoriteSerializer
-        return self.create_delete_extra(
+        return self._create_delete_extra(
             request,
             pk,
             model,
