@@ -3,12 +3,12 @@ version: '3.7'
 
 services:
 
-#  frontend:
-#    build:
-#      context: ../frontend
-#      dockerfile: Dockerfile
-#    volumes:
-#      - ../frontend/:/app/result_build/
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
+    volumes:
+      - ../frontend/:/app/result_build/
 
 
   db:
