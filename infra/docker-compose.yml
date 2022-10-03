@@ -10,7 +10,6 @@ services:
     volumes:
       - ../frontend/:/app/result_build/
 
-
   db:
     image: postgres:13.0-alpine
     volumes:
