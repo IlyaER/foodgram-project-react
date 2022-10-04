@@ -17,22 +17,16 @@ services:
       - .env
   web:
     image: ilyarog/foodgram:latest
-    #build:
-    #  context: ../backend
     restart: always
-    #ports:
-    #  - "8000:8000"
     volumes:
       - static_value:/app/static/
       - media_value:/app/media/
-    #  - frontend_value:/app/build/
     depends_on:
       - db
     env_file:
       - .env
 
   nginx:
-    #image: nginx:1.19.3
     build: .
     ports:
       - "80:80"
