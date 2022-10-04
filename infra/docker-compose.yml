@@ -24,8 +24,8 @@ services:
     #ports:
     #  - "8000:8000"
     volumes:
-      - static_value:/static/
-      - media_value:/media/
+      - static_value:/app/static/
+      - media_value:/app/media/
     #  - frontend_value:/app/build/
     depends_on:
       - db
