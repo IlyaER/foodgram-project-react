@@ -145,8 +145,8 @@ USE_L10N = True
 USE_TZ = True
 
 
-STATIC_URL = 'static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATIC_URL = 'static_back/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static_back')
 #STATICFILES_DIRS = [os.path.join(BASE_DIR, './frontend/build/static')]
 
 
