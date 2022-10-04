@@ -1,13 +1,31 @@
 
 name: Django-app workflow
 
-on: [push]
+on:
+  push:
+    branches: [ master ]
 
 jobs:
+
+  server_install:
+    name: prepare server for installation
+    runs-on: ubuntu-20.04
+    steps:
+    - name: copy files
+      uses: appleboy/scp-action@master
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USER }}
+        key: ${{ secrets.SSH_KEY }}
+        source: "frontend"
+        target: "frontend"
+
+
   build_and_push_to_dockerhub:
     name: Push Docker image to Docker Hub
     if: github.ref == 'refs/heads/master'
     runs-on: ubuntu-20.04
+    needs: server_install
 
     steps:
       - name: checkout repo
@@ -48,4 +66,4 @@ jobs:
             echo POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} >> .env
             echo DB_HOST=${{ secrets.DB_HOST }} >> .env
             echo DB_PORT=${{ secrets.DB_PORT }} >> .env
-            sudo docker-compose up -d
+            sudo docker-compose up -d --build
