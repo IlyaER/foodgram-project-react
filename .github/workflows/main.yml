@@ -7,29 +7,29 @@ on:
 
 jobs:
 
-  server_install:
-    name: prepare server for installation
-    runs-on: ubuntu-20.04
-    steps:
-    - uses: actions/checkout@v2
-    - name: Run a multi-line script
-      run: |
-        tar -cvf frontend.tar ./frontend/
-    - name: copy files
-      uses: appleboy/scp-action@master
-      with:
-        host: ${{ secrets.HOST }}
-        username: ${{ secrets.USER }}
-        key: ${{ secrets.SSH_KEY }}
-        source: "frontend.tar"
-        target: "frontend/"
+  #server_install:
+  #  name: prepare server for installation
+  #  runs-on: ubuntu-20.04
+  #  steps:
+  #  - uses: actions/checkout@v2
+  #  - name: Run a multi-line script
+  #    run: |
+  #      tar -cvf frontend.tar frontend/
+  #  - name: copy files
+  #    uses: appleboy/scp-action@master
+  #    with:
+  #      host: ${{ secrets.HOST }}
+  #      username: ${{ secrets.USER }}
+  #      key: ${{ secrets.SSH_KEY }}
+  #      source: "frontend.tar"
+  #      target: "frontend/"
 
 
   build_and_push_to_dockerhub:
     name: Push Docker image to Docker Hub
     if: github.ref == 'refs/heads/master'
     runs-on: ubuntu-20.04
-    needs: server_install
+    #needs: server_install
 
     steps:
       - name: checkout repo
