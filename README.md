@@ -22,10 +22,25 @@ Nginx
 
 Склонируйте репозиторий
 
-Рекомендуется ставить с помощью docker
-
-### Установка из Docker
-
 ```
 docker-compose up -d
 ```
+
+### Тестовые данные
+Загрузка тестовых данных в базу штатным средством приложения
+```
+docker-compose exec web sh -c "chmod +x fixtures/migrate.sh"
+docker-compose exec web sh -c "fixtures/migrate.sh"
+```
+
+Суперпользователь для тестов.
+Имя:    admin@admin.ru
+Пароль: admin
+
+
+###Тестовый сервер
+
+**http://178.154.206.46/**
+
+Login: admin@admin.ru
+Password: adminpasswordveryhardtocrack
