@@ -7,22 +7,27 @@ on:
 
 jobs:
 
-  #server_install:
-  #  name: prepare server for installation
-  #  runs-on: ubuntu-20.04
-  #  steps:
-  #  - uses: actions/checkout@v2
-  #  - name: Run a multi-line script
-  #    run: |
-  #      tar -cvf frontend.tar frontend/
-  #  - name: copy files
-  #    uses: appleboy/scp-action@master
-  #    with:
-  #      host: ${{ secrets.HOST }}
-  #      username: ${{ secrets.USER }}
-  #      key: ${{ secrets.SSH_KEY }}
-  #      source: "frontend.tar"
-  #      target: "frontend/"
+  server_install:
+    name: prepare server for installation
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v2
+    - name: Run a multi-line script
+      run: |
+        sudo groupadd docker
+        sudo usermod -aG docker $USER
+        sudo systemctl enable docker.service
+        sudo systemctl enable containerd.service
+        newgrp docker
+        tar -cvf frontend.tar frontend/
+    - name: copy files
+      uses: appleboy/scp-action@master
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USER }}
+        key: ${{ secrets.SSH_KEY }}
+        source: "frontend.tar"
+        target: "frontend/"
 
 
   build_and_push_to_dockerhub:
@@ -59,8 +64,8 @@ jobs:
           username: ${{ secrets.USER }}
           key: ${{ secrets.SSH_KEY }}
           script: |
-            sudo docker-compose stop --rmi all
-            sudo docker-compose rm web
+            docker-compose stop --rmi all
+            docker-compose pull
             rm .env
             touch .env
             echo DB_ENGINE=${{ secrets.DB_ENGINE }} >> .env
@@ -70,4 +75,4 @@ jobs:
             echo POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} >> .env
             echo DB_HOST=${{ secrets.DB_HOST }} >> .env
             echo DB_PORT=${{ secrets.DB_PORT }} >> .env
-            sudo docker-compose up -d --build
+            docker-compose up -d --build
