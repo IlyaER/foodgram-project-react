@@ -37,10 +37,3 @@ docker-compose exec web sh -c "fixtures/migrate.sh"
 Имя:    admin@admin.ru
 Пароль: admin
 
-
-###Тестовый сервер
-
-**http://178.154.206.46/**
-
-Login: admin@admin.ru
-Password: adminpasswordveryhardtocrack
